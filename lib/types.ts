@@ -16,7 +16,10 @@ export type Property = {
   maps_url: string | null;
   whatsapp_e164: string | null;
   capacity: number;
+  /** ARS · tarifa por noche cuando la estadía es de 2+ noches */
   price_per_night: number;
+  /** ARS · tarifa total de 1 sola noche (si null → usa price_per_night) */
+  price_one_night: number | null;
   weekend_pack_price: number | null;
   cleaning_fee: number;
   currency: string;

@@ -1,5 +1,10 @@
 import type { Availability, Photo, Property, Reservation } from "@/lib/types";
 import { addDays, format, getDay, startOfDay } from "date-fns";
+import {
+  DEFAULT_PRICE_MULTI_NIGHT_USD,
+  DEFAULT_PRICE_ONE_NIGHT_USD,
+  usdToArs,
+} from "@/lib/fx";
 
 export const DEMO_PROPERTY: Property = {
   id: "00000000-0000-0000-0000-000000000001",
@@ -11,11 +16,13 @@ export const DEMO_PROPERTY: Property = {
   maps_url: "https://maps.google.com/?q=San+Martin+e+Yrigoyen,+Tandil",
   whatsapp_e164: "5492266515776",
   capacity: 3,
-  price_per_night: 77500,
+  // ARS publicados: 1 noche = USD 80 · 2+ = USD 60/noche (blue 1560)
+  price_one_night: usdToArs(DEFAULT_PRICE_ONE_NIGHT_USD),
+  price_per_night: usdToArs(DEFAULT_PRICE_MULTI_NIGHT_USD),
   weekend_pack_price: null,
   cleaning_fee: 0,
   currency: "ARS",
-  min_nights: 2,
+  min_nights: 1,
   check_in_time: "15:00",
   check_out_time: "11:00",
   amenities: [

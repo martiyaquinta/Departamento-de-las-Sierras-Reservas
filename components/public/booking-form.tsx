@@ -22,7 +22,10 @@ import type { Availability } from "@/lib/types";
 type Props = {
   availability: Availability[];
   bookedNights: string[];
+  /** ARS · 2+ noches */
   pricePerNight: number;
+  /** ARS · 1 noche */
+  priceOneNight: number | null;
   weekendPackPrice: number | null;
   cleaningFee: number;
   capacity: number;
@@ -34,6 +37,7 @@ export function BookingForm({
   availability,
   bookedNights,
   pricePerNight,
+  priceOneNight,
   weekendPackPrice,
   cleaningFee,
   capacity,
@@ -55,6 +59,9 @@ export function BookingForm({
     [availability, bookedSet]
   );
 
+  const oneNightArs =
+    priceOneNight != null && priceOneNight > 0 ? priceOneNight : pricePerNight;
+
   const checkIn = range?.from ? format(range.from, "yyyy-MM-dd") : "";
   const checkOut = range?.to ? format(range.to, "yyyy-MM-dd") : "";
 
@@ -64,6 +71,7 @@ export function BookingForm({
           checkIn,
           checkOut,
           pricePerNight,
+          priceOneNight: oneNightArs,
           weekendPackPrice,
           cleaningFee,
         })
@@ -100,6 +108,7 @@ export function BookingForm({
         guests,
         publicCode: code,
         totalAmount: total || undefined,
+        currency: "ARS",
         guestPhone,
         message,
       });
@@ -109,7 +118,6 @@ export function BookingForm({
       const gracias = `/gracias?code=${encodeURIComponent(code)}&name=${encodeURIComponent(guestName)}&in=${checkIn}&out=${checkOut}&guests=${guests}&total=${total}&wa=1`;
 
       if (wa) {
-        // Redirección inmediata a WhatsApp con el pedido armado
         window.location.href = wa;
         return;
       }
@@ -124,8 +132,8 @@ export function BookingForm({
         <CardHeader>
           <CardTitle className="font-serif text-xl">Elegí tus noches</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Solo findes (y puentes que abramos). Check-in el viernes · check-out el domingo.
-            Las fechas tachadas no se pueden elegir.
+            Solo findes (y puentes que abramos). Check-in el viernes · check-out el
+            domingo. Las fechas tachadas no se pueden elegir.
           </p>
         </CardHeader>
         <CardContent>
@@ -211,8 +219,12 @@ export function BookingForm({
       <Card className="border-primary/30 bg-crema">
         <CardContent className="space-y-3 pt-5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Precio / noche</span>
-            <span>{formatARS(pricePerNight)}</span>
+            <span className="text-muted-foreground">1 noche</span>
+            <span>{formatARS(oneNightArs)}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">2 o más noches</span>
+            <span>{formatARS(pricePerNight)} / noche</span>
           </div>
           {minNights > 1 && (
             <p className="text-xs text-muted-foreground">Mínimo {minNights} noches</p>
@@ -222,8 +234,13 @@ export function BookingForm({
               <div className="flex items-center justify-between text-sm">
                 <span>
                   {pricing.nights} noche{pricing.nights === 1 ? "" : "s"}
+                  {pricing.nights === 1
+                    ? ""
+                    : ` × ${formatARS(pricing.unitPrice)}`}
                 </span>
-                <span className="font-semibold">{formatARS(pricing.total - cleaningFee)}</span>
+                <span className="font-semibold">
+                  {formatARS(pricing.total - cleaningFee)}
+                </span>
               </div>
               {cleaningFee > 0 && (
                 <div className="flex items-center justify-between text-sm">
@@ -238,7 +255,8 @@ export function BookingForm({
             </>
           )}
           <p className="text-xs text-muted-foreground">
-            Es una solicitud. El dueño confirma y te escribe. No hay cobro online en esta versión.
+            Es una solicitud. El dueño confirma y te escribe. No hay cobro online en esta
+            versión. Montos en pesos.
           </p>
           <Button type="submit" size="lg" className="w-full" disabled={pending}>
             {pending ? "Enviando..." : "Reservar y abrir WhatsApp"}

@@ -82,6 +82,7 @@ export async function createReservationAction(
     checkIn: input.checkIn,
     checkOut: input.checkOut,
     pricePerNight: property.price_per_night,
+    priceOneNight: property.price_one_night,
     weekendPackPrice: property.weekend_pack_price,
     cleaningFee: property.cleaning_fee,
   });

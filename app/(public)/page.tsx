@@ -162,15 +162,32 @@ export default async function HomePage() {
           <Card className="border-primary/25 bg-gradient-to-br from-crema to-arena">
             <CardContent className="space-y-3 p-5">
               <h2 className="font-serif text-xl font-semibold">Precio</h2>
-              <p className="text-3xl font-bold text-primary">
-                {formatARS(property.price_per_night)}
-                <span className="text-base font-normal text-muted-foreground"> / noche</span>
-              </p>
+              <div className="space-y-1">
+                <p className="text-3xl font-bold text-primary">
+                  {formatARS(
+                    property.price_one_night != null && property.price_one_night > 0
+                      ? property.price_one_night
+                      : property.price_per_night
+                  )}
+                  <span className="text-base font-normal text-muted-foreground">
+                    {" "}
+                    · 1 noche
+                  </span>
+                </p>
+                <p className="text-lg font-semibold text-marron">
+                  {formatARS(property.price_per_night)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    / noche · 2 o más noches
+                  </span>
+                </p>
+              </div>
               {property.cleaning_fee > 0 && (
                 <p className="text-sm text-muted-foreground">
                   + limpieza {formatARS(property.cleaning_fee)}
                 </p>
               )}
+              <p className="text-xs text-muted-foreground">Montos en pesos argentinos.</p>
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/reservar">Ver disponibilidad</Link>
               </Button>
@@ -230,7 +247,14 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <StickyCta priceFrom={property.price_per_night} />
+      <StickyCta
+        priceFrom={
+          property.price_one_night != null && property.price_one_night > 0
+            ? property.price_one_night
+            : property.price_per_night
+        }
+        priceMulti={property.price_per_night}
+      />
     </>
   );
 }
