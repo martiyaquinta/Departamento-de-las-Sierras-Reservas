@@ -21,6 +21,7 @@ import {
   normalizeAdminEmail,
 } from "@/lib/admin-allowlist";
 import type { ActionResult } from "@/lib/actions/reservations";
+import { USD_ARS_RATE, usdToArs } from "@/lib/fx";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -100,16 +101,20 @@ export async function updatePropertyPriceAction(raw: unknown): Promise<ActionRes
     const { data: row } = await supabase.from("property").select("id").limit(1).maybeSingle();
     if (!row) return { ok: false, error: "No hay property configurada" };
 
-    const currency = (d.currency || "ARS").toUpperCase();
+    const rate = d.usd_ars_rate && d.usd_ars_rate > 0 ? d.usd_ars_rate : USD_ARS_RATE;
+    const priceOneNightArs = usdToArs(d.price_one_night_usd, rate);
+    const priceMultiNightArs = usdToArs(d.price_multi_night_usd, rate);
+    const cleaningArs = usdToArs(d.cleaning_fee_usd ?? 0, rate);
 
     const { error } = await supabase
       .from("property")
       .update({
-        price_per_night: d.price_per_night,
-        // Pack finde desactivado
+        // Publicados siempre en ARS
+        price_one_night: priceOneNightArs,
+        price_per_night: priceMultiNightArs,
         weekend_pack_price: null,
-        cleaning_fee: d.cleaning_fee,
-        currency,
+        cleaning_fee: cleaningArs,
+        currency: "ARS",
         min_nights: d.min_nights,
         updated_at: new Date().toISOString(),
       })

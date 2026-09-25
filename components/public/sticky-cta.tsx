@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { formatARS } from "@/lib/utils";
 
-export function StickyCta({ priceFrom }: { priceFrom: number }) {
+export function StickyCta({
+  priceFrom,
+  priceMulti,
+}: {
+  /** ARS · 1 noche (o "desde") */
+  priceFrom: number;
+  /** ARS · 2+ por noche */
+  priceMulti?: number;
+}) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-crema/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
@@ -9,8 +17,13 @@ export function StickyCta({ priceFrom }: { priceFrom: number }) {
           <p className="text-xs text-muted-foreground">Desde</p>
           <p className="truncate font-semibold text-marron">
             {formatARS(priceFrom)}
-            <span className="text-xs font-normal text-muted-foreground"> / noche</span>
+            <span className="text-xs font-normal text-muted-foreground"> · 1 noche</span>
           </p>
+          {priceMulti != null && priceMulti > 0 && (
+            <p className="truncate text-xs text-muted-foreground">
+              {formatARS(priceMulti)} / noche · 2+
+            </p>
+          )}
         </div>
         <Link
           href="/reservar"

@@ -46,12 +46,16 @@ export const propertyContentSchema = z.object({
   amenities: z.string().max(2000),
 });
 
+/** Admin manda tarifas en USD; el server las convierte a ARS. */
 export const propertyPriceSchema = z.object({
-  price_per_night: z.coerce.number().min(0),
-  weekend_pack_price: z.coerce.number().min(0).optional().or(z.literal("")),
-  cleaning_fee: z.coerce.number().min(0),
-  currency: z.string().min(3).max(3),
+  /** USD · 1 noche */
+  price_one_night_usd: z.coerce.number().min(0),
+  /** USD · por noche cuando la estadía es de 2+ noches */
+  price_multi_night_usd: z.coerce.number().min(0),
+  cleaning_fee_usd: z.coerce.number().min(0).default(0),
   min_nights: z.coerce.number().int().min(1).max(30),
+  /** Cotización ARS/USD opcional (default lib/fx) */
+  usd_ars_rate: z.coerce.number().min(1).optional(),
 });
 
 export const availabilityRangeSchema = z.object({

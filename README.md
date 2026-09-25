@@ -44,8 +44,21 @@ En el SQL Editor de Supabase, ejecutá el contenido de:
 supabase/migrations/0001_init.sql
 ```
 
-Eso crea tablas, RLS, seed de `property` y availability. Aplicá también `0002_ars_vie_dom_availability.sql` (precios ARS + finde vie→dom hasta 2026-12-31).
-Tarifa seed: **ARS 77.500/noche** (sin pack; finde = 2 × noche). Noches libres por defecto: **vie+sáb** (checkout domingo).
+Eso crea tablas, RLS, seed de `property` y availability. Aplicá también:
+
+- `0002_ars_vie_dom_availability.sql` — precios ARS + finde vie→dom hasta 2026-12-31  
+- `0003_push_subscriptions.sql` — Web Push admin  
+- `0004_disable_weekend_pack.sql` — sin pack finde  
+- `0005_price_one_vs_multi_night.sql` — tarifa 1 noche vs 2+
+
+**Tarifa actual (publicada en ARS, cotización blue venta 1560 al 2026-09-25):**
+
+| Estadía | USD (admin) | ARS (web) |
+|---|---|---|
+| 1 noche | 80 | **$124.800** |
+| 2+ noches | 60 / noche | **$93.600 / noche** |
+
+Noches libres por defecto: **vie+sáb** (checkout domingo). El admin edita en **USD** (`/admin/precio`); la web y los totales se guardan/muestran en **pesos**.
 
 ### 3. Storage
 

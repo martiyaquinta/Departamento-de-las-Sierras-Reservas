@@ -69,8 +69,17 @@ export default async function AdminDashboard() {
         </Card>
         <Card className="bg-crema col-span-2 sm:col-span-1">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Precio / noche</p>
-            <p className="text-2xl font-bold">{formatARS(property.price_per_night)}</p>
+            <p className="text-xs text-muted-foreground">1 noche · 2+</p>
+            <p className="text-lg font-bold leading-tight">
+              {formatARS(
+                property.price_one_night != null && property.price_one_night > 0
+                  ? property.price_one_night
+                  : property.price_per_night
+              )}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {formatARS(property.price_per_night)} / noche (2+)
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -37,6 +37,8 @@ function mapProperty(row: Record<string, unknown>): Property {
     whatsapp_e164: (row.whatsapp_e164 as string) ?? null,
     capacity: Number(row.capacity ?? 3),
     price_per_night: Number(row.price_per_night ?? 0),
+    price_one_night:
+      row.price_one_night == null ? null : Number(row.price_one_night),
     weekend_pack_price:
       row.weekend_pack_price == null ? null : Number(row.weekend_pack_price),
     cleaning_fee: Number(row.cleaning_fee ?? 0),

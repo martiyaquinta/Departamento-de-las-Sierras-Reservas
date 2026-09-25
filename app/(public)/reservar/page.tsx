@@ -30,6 +30,7 @@ export default async function ReservarPage() {
         availability={availability}
         bookedNights={[...booked]}
         pricePerNight={property.price_per_night}
+        priceOneNight={property.price_one_night}
         weekendPackPrice={property.weekend_pack_price}
         cleaningFee={property.cleaning_fee}
         capacity={property.capacity}
