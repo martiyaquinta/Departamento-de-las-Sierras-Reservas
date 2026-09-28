@@ -22,6 +22,7 @@ import {
 } from "@/lib/admin-allowlist";
 import type { ActionResult } from "@/lib/actions/reservations";
 import { USD_ARS_RATE, usdToArs } from "@/lib/fx";
+import { syncBookingIcal, type BookingSyncResult } from "@/lib/booking-sync";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -393,4 +394,22 @@ export async function logoutAction(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/admin");
+}
+
+/** Pull Booking iCal → block those nights on the web calendar. */
+export async function syncBookingIcalAction(): Promise<
+  ActionResult<BookingSyncResult>
+> {
+  try {
+    await requireAdmin();
+    const result = await syncBookingIcal();
+    if (!result.ok) return { ok: false, error: result.error };
+    revalidatePath("/reservar");
+    revalidatePath("/admin/calendario");
+    revalidatePath("/admin");
+    revalidatePath("/");
+    return { ok: true, data: result };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Error" };
+  }
 }

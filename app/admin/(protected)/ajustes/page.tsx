@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PushEnable } from "@/components/admin/push-enable";
+import { BookingSyncButton } from "@/components/admin/booking-sync-button";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
+import { getBookingIcalUrl } from "@/lib/booking-sync";
 
 function siteBase(): string {
   const raw =
@@ -16,6 +18,7 @@ export default function AdminAjustesPage() {
     icalToken.length >= 16
       ? `${siteBase()}/api/calendar/export.ics?token=${encodeURIComponent(icalToken)}`
       : null;
+  const bookingUrl = getBookingIcalUrl();
 
   return (
     <div className="mx-auto max-w-md space-y-4">
@@ -32,13 +35,13 @@ export default function AdminAjustesPage() {
 
       <Card className="bg-crema">
         <CardHeader>
-          <CardTitle className="text-base">Calendario iCal (Booking / Airbnb)</CardTitle>
+          <CardTitle className="text-base">Web → Booking (export iCal)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Pegá este link en Booking → Calendario → Sincronizar calendarios → Importar
-            calendario. Booking va a marcar ocupadas las fechas que ya están reservadas o
-            bloqueadas acá.
+            Pegá este link en Booking → Calendario → Sincronizar → Importar calendario.
+            Booking marca ocupado lo reservado/bloqueado acá (sin reenviar lo que vino de
+            Booking).
           </p>
           {icalUrl ? (
             <div className="space-y-2">
@@ -47,18 +50,41 @@ export default function AdminAjustesPage() {
                 {icalUrl}
               </p>
               <p className="text-xs">
-                Nombre sugerido: <strong className="text-foreground">Web De Las Sierras</strong>
+                Nombre: <strong className="text-foreground">Web De Las Sierras</strong>
               </p>
             </div>
           ) : (
             <p className="text-destructive text-xs">
-              Falta <code className="font-mono">ICAL_EXPORT_TOKEN</code> en Vercel (mín. 16
-              caracteres) + redeploy. Sin eso el export no funciona.
+              Falta <code className="font-mono">ICAL_EXPORT_TOKEN</code> en Vercel + redeploy.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="bg-crema">
+        <CardHeader>
+          <CardTitle className="text-base">Booking → Web (import iCal)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            La web baja el calendario de Booking cada 6 h (y podés forzar acá). Las fechas
+            ocupadas en Booking se bloquean en el calendario de la web.
+          </p>
+          {bookingUrl ? (
+            <>
+              <p className="break-all rounded-md border bg-background p-3 font-mono text-[10px] text-foreground">
+                {bookingUrl}
+              </p>
+              <BookingSyncButton />
+            </>
+          ) : (
+            <p className="text-destructive text-xs">
+              Falta <code className="font-mono">BOOKING_ICAL_URL</code> en Vercel (el link
+              ical.booking.com/v1/export?t=…) + redeploy.
             </p>
           )}
           <p className="text-xs">
-            Solo exporta ocupación (sin datos del huésped). La sync tarda un rato en Booking
-            (no es al instante).
+            Si Booking no tiene reservas, el feed viene vacío y no hay nada que bloquear.
           </p>
         </CardContent>
       </Card>

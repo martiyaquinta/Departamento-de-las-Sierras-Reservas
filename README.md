@@ -118,7 +118,8 @@ pnpm start
 | `/reservar` | Flujo de reserva |
 | `/reserva/[code]` | Estado (ej. `DS-7K2P`) |
 | `/gracias` | Post-envío + WhatsApp |
-| `/api/calendar/export.ics?token=…` | iCal de ocupación (Booking/Airbnb import) |
+| `/api/calendar/export.ics?token=…` | iCal ocupación → Booking |
+| `/api/calendar/sync-booking` | Import iCal Booking → web (cron 6h + manual) |
 | `/admin/login` | Login |
 | `/admin` | Dashboard |
 | `/admin/reservas` | Confirmar / rechazar |
@@ -126,18 +127,22 @@ pnpm start
 | `/admin/fotos` | Upload / orden / cover |
 | `/admin/precio` | Precio y fees (persiste en DB → web) |
 | `/admin/contenido` | Textos, amenities, WA |
-| `/admin/ajustes` | Push + iCal link + cuenta |
+| `/admin/ajustes` | Push + iCal bidireccional + cuenta |
 | `/offline` | Fallback PWA |
 
-### Sync iCal → Booking
+### Sync iCal bidireccional (Booking)
 
-1. En Vercel seteá `ICAL_EXPORT_TOKEN` (string largo, min 16) + `NEXT_PUBLIC_SITE_URL=https://departamentodelassierras.vercel.app`
-2. Redeploy
-3. Link: `https://departamentodelassierras.vercel.app/api/calendar/export.ics?token=TU_TOKEN`
-4. En Booking → Calendario → Sincronizar → Importar calendario → pegá el link
-5. Nombre: **Web De Las Sierras**
+**Web → Booking (export)**  
+1. `ICAL_EXPORT_TOKEN` en Vercel + redeploy  
+2. Link: `https://departamentodelassierras.vercel.app/api/calendar/export.ics?token=TU_TOKEN`  
+3. Booking → Calendario → Importar → pegá el link · Nombre: **Web De Las Sierras**  
+4. Marca ocupado: reservas activas + blocked manuales (no reexporta lo importado de Booking)
 
-El feed marca ocupado: reservas confirmed + pending con hold, y noches `blocked` del admin. No expone datos del huésped.
+**Booking → Web (import)**  
+1. `BOOKING_ICAL_URL=https://ical.booking.com/v1/export?t=…` en Vercel  
+2. Cron cada 6h: `/api/calendar/sync-booking` (auth Bearer `CRON_SECRET` o `ICAL_EXPORT_TOKEN`)  
+3. O en `/admin/ajustes` → “Sincronizar Booking ahora”  
+4. Noches del feed Booking se marcan `blocked` con note `booking-ical`
 
 ## Reglas de negocio v1
 
