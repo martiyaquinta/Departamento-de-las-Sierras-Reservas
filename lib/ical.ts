@@ -2,6 +2,9 @@ import { addDays, format, parseISO } from "date-fns";
 import type { Availability, Reservation } from "@/lib/types";
 import { buildBookedNightSet, nightsInRange } from "@/lib/availability";
 
+/** Marker on availability.note for blocks imported from Booking iCal */
+export const BOOKING_ICAL_NOTE = "booking-ical";
+
 export type IcalBusyEvent = {
   uid: string;
   summary: string;
@@ -22,7 +25,6 @@ function escapeText(value: string): string {
 }
 
 function foldLine(line: string): string {
-  // RFC 5545: lines should be ≤ 75 octets; fold with CRLF + space
   if (line.length <= 75) return line;
   const parts: string[] = [];
   let remaining = line;
@@ -47,6 +49,144 @@ function formatUtcStamp(d = new Date()): string {
 
 function toIcalDate(yyyyMmDd: string): string {
   return yyyyMmDd.replace(/-/g, "");
+}
+
+/** Unfold RFC 5545 folded lines, keep content lines */
+function unfoldIcs(raw: string): string[] {
+  const normalized = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const out: string[] = [];
+  for (const line of normalized.split("\n")) {
+    if (!line) continue;
+    if ((line.startsWith(" ") || line.startsWith("\t")) && out.length > 0) {
+      out[out.length - 1] = out[out.length - 1]! + line.slice(1);
+    } else {
+      out.push(line);
+    }
+  }
+  return out;
+}
+
+function unescapeIcsText(value: string): string {
+  return value
+    .replace(/\\n/gi, "\n")
+    .replace(/\\,/g, ",")
+    .replace(/\\;/g, ";")
+    .replace(/\\\\/g, "\\");
+}
+
+/**
+ * Parse DTSTART/DTEND values to YYYY-MM-DD.
+ * All-day DATE → as-is. Date-time → UTC calendar date.
+ */
+export function parseIcsDateValue(raw: string): string | null {
+  const v = raw.trim();
+  // YYYYMMDD
+  if (/^\d{8}$/.test(v)) {
+    return `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`;
+  }
+  // YYYYMMDDTHHMMSS or with Z / ±offset
+  const m = v.match(/^(\d{8})T(\d{6})(Z)?$/);
+  if (m) {
+    const d = m[1]!;
+    // DATE-TIME: use calendar date portion (hotel local / UTC day)
+    return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
+  }
+  // ISO-ish already
+  if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
+  return null;
+}
+
+function propValue(line: string): { name: string; value: string } | null {
+  const idx = line.indexOf(":");
+  if (idx < 0) return null;
+  const left = line.slice(0, idx);
+  const value = line.slice(idx + 1);
+  const name = left.split(";")[0]?.toUpperCase() ?? "";
+  return { name, value };
+}
+
+/** Parse VEVENT busy ranges from an ICS string (Booking/Airbnb export). */
+export function parseIcsBusyEvents(ics: string): IcalBusyEvent[] {
+  const lines = unfoldIcs(ics);
+  const events: IcalBusyEvent[] = [];
+  let inEvent = false;
+  let uid = "";
+  let summary = "";
+  let description = "";
+  let start: string | null = null;
+  let end: string | null = null;
+  let stamp: string | undefined;
+
+  const flush = () => {
+    if (start && end && end > start) {
+      events.push({
+        uid: uid || `anon-${start}-${end}@import`,
+        summary: summary || "Busy",
+        description: description || undefined,
+        start,
+        end,
+        stamp,
+      });
+    }
+    uid = "";
+    summary = "";
+    description = "";
+    start = null;
+    end = null;
+    stamp = undefined;
+  };
+
+  for (const line of lines) {
+    const upper = line.toUpperCase();
+    if (upper === "BEGIN:VEVENT") {
+      inEvent = true;
+      continue;
+    }
+    if (upper === "END:VEVENT") {
+      if (inEvent) flush();
+      inEvent = false;
+      continue;
+    }
+    if (!inEvent) continue;
+
+    const p = propValue(line);
+    if (!p) continue;
+    switch (p.name) {
+      case "UID":
+        uid = p.value.trim();
+        break;
+      case "SUMMARY":
+        summary = unescapeIcsText(p.value);
+        break;
+      case "DESCRIPTION":
+        description = unescapeIcsText(p.value);
+        break;
+      case "DTSTART":
+        start = parseIcsDateValue(p.value);
+        break;
+      case "DTEND":
+        end = parseIcsDateValue(p.value);
+        break;
+      case "DTSTAMP":
+        stamp = p.value.includes("T")
+          ? undefined
+          : parseIcsDateValue(p.value) ?? undefined;
+        break;
+      default:
+        break;
+    }
+  }
+
+  return events.sort((a, b) => a.start.localeCompare(b.start));
+}
+
+/** Expand events to night keys (check_in inclusive, check_out exclusive). */
+export function busyNightsFromEvents(events: IcalBusyEvent[]): string[] {
+  const set = new Set<string>();
+  for (const ev of events) {
+    for (const n of nightsInRange(ev.start, ev.end)) set.add(n);
+  }
+  return [...set].sort();
 }
 
 /** Merge sorted unique night keys into [start, endExclusive) ranges */
@@ -83,6 +223,7 @@ export function mergeNightKeysToRanges(nights: string[]): { start: string; end: 
  * Busy periods for external channels (Booking/Airbnb):
  * - reservas confirmed + pending con hold vigente
  * - noches blocked en availability (cierres manuales / offline)
+ * - NO re-exporta bloques importados de Booking (evita loop)
  */
 export function buildBusyEvents(params: {
   reservations: Pick<
@@ -119,7 +260,8 @@ export function buildBusyEvents(params: {
   const blockedNights: string[] = [];
   for (const a of availability) {
     if (a.status !== "blocked") continue;
-    if (booked.has(a.night_date)) continue; // already covered by reservation event
+    if (a.note === BOOKING_ICAL_NOTE) continue; // already on Booking
+    if (booked.has(a.night_date)) continue;
     blockedNights.push(a.night_date);
   }
 
@@ -179,4 +321,12 @@ export function renderIcsCalendar(params: {
 /** Nights covered by a busy event (for tests / debug) */
 export function eventNights(ev: IcalBusyEvent): string[] {
   return nightsInRange(ev.start, ev.end);
+}
+
+/** Default weekend rule: Fri+Sat available (dow 5,6). Local calendar date. */
+export function defaultStatusForNight(yyyyMmDd: string): "available" | "blocked" {
+  const [y, m, d] = yyyyMmDd.split("-").map((x) => Number(x));
+  if (!y || !m || !d) return "blocked";
+  const dow = new Date(y, m - 1, d).getDay(); // local, not UTC
+  return dow === 5 || dow === 6 ? "available" : "blocked";
 }
