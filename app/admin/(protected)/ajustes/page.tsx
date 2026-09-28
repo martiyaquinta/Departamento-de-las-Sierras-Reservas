@@ -67,7 +67,7 @@ export default function AdminAjustesPage() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            La web baja el calendario de Booking cada 6 h (y podés forzar acá). Las fechas
+            La web baja el calendario de Booking 1 vez al día (y podés forzar acá). Las fechas
             ocupadas en Booking se bloquean en el calendario de la web.
           </p>
           {bookingUrl ? (

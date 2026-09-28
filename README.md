@@ -140,7 +140,7 @@ pnpm start
 
 **Booking → Web (import)**  
 1. `BOOKING_ICAL_URL=https://ical.booking.com/v1/export?t=…` en Vercel  
-2. Cron cada 6h: `/api/calendar/sync-booking` (auth Bearer `CRON_SECRET` o `ICAL_EXPORT_TOKEN`)  
+2. Cron diario 11:00 UTC (`/api/calendar/sync-booking`, auth Bearer `CRON_SECRET` o `ICAL_EXPORT_TOKEN`)  
 3. O en `/admin/ajustes` → “Sincronizar Booking ahora”  
 4. Noches del feed Booking se marcan `blocked` con note `booking-ical`
 
