@@ -16,7 +16,7 @@ export default function AdminAjustesPage() {
   const icalToken = String(process.env.ICAL_EXPORT_TOKEN ?? "").trim();
   const icalUrl =
     icalToken.length >= 16
-      ? `${siteBase()}/api/calendar/export.ics?token=${encodeURIComponent(icalToken)}`
+      ? `${siteBase()}/api/ical/${encodeURIComponent(icalToken)}.ics`
       : null;
   const bookingUrl = getBookingIcalUrl();
 

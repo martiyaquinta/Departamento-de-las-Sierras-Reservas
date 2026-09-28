@@ -233,7 +233,8 @@ export function buildBusyEvents(params: {
   availability: Availability[];
   propertyName?: string;
 }): IcalBusyEvent[] {
-  const { reservations, availability, propertyName = "Departamento de las Sierras" } = params;
+  const { reservations, availability } = params;
+  void params.propertyName; // kept for call-site compatibility
   const now = new Date();
   const events: IcalBusyEvent[] = [];
 
@@ -247,9 +248,9 @@ export function buildBusyEvents(params: {
     if (!r.check_in || !r.check_out || r.check_out <= r.check_in) continue;
 
     events.push({
-      uid: `res-${r.id}@departamentodelassierras`,
-      summary: `Reservado — ${propertyName}`,
-      description: `Reserva ${r.public_code} (${r.status})`,
+      uid: `res-${r.id}@departamentodelassierras.vercel.app`,
+      summary: "CLOSED",
+      description: `Reservation ${r.public_code}`,
       start: r.check_in,
       end: r.check_out,
       stamp: r.updated_at,
@@ -267,9 +268,9 @@ export function buildBusyEvents(params: {
 
   for (const range of mergeNightKeysToRanges(blockedNights)) {
     events.push({
-      uid: `block-${range.start}-${range.end}@departamentodelassierras`,
-      summary: `No disponible — ${propertyName}`,
-      description: "Bloqueo manual / fuera de temporada",
+      uid: `block-${range.start}-${range.end}@departamentodelassierras.vercel.app`,
+      summary: "CLOSED",
+      description: "Blocked",
       start: range.start,
       end: range.end,
     });
@@ -286,7 +287,7 @@ export function renderIcsCalendar(params: {
   const {
     calName,
     events,
-    prodId = "-//Departamento de las Sierras//Reservas//ES",
+    prodId = "-//DeLasSierras//Calendar//EN",
   } = params;
   const stamp = formatUtcStamp();
   const lines: string[] = [
@@ -296,7 +297,6 @@ export function renderIcsCalendar(params: {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${escapeText(calName)}`,
-    "X-WR-TIMEZONE:America/Argentina/Buenos_Aires",
   ];
 
   for (const ev of events) {

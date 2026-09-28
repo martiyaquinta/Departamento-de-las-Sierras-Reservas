@@ -118,8 +118,9 @@ pnpm start
 | `/reservar` | Flujo de reserva |
 | `/reserva/[code]` | Estado (ej. `DS-7K2P`) |
 | `/gracias` | Post-envío + WhatsApp |
-| `/api/calendar/export.ics?token=…` | iCal ocupación → Booking |
-| `/api/calendar/sync-booking` | Import iCal Booking → web (cron 6h + manual) |
+| `/api/ical/<token>.ics` | iCal ocupación → Booking (preferido) |
+| `/api/calendar/export.ics?token=…` | iCal ocupación → Booking (legacy) |
+| `/api/calendar/sync-booking` | Import iCal Booking → web (cron diario + manual) |
 | `/admin/login` | Login |
 | `/admin` | Dashboard |
 | `/admin/reservas` | Confirmar / rechazar |
@@ -134,9 +135,9 @@ pnpm start
 
 **Web → Booking (export)**  
 1. `ICAL_EXPORT_TOKEN` en Vercel + redeploy  
-2. Link: `https://departamentodelassierras.vercel.app/api/calendar/export.ics?token=TU_TOKEN`  
+2. Link preferido (sin query): `https://departamentodelassierras.vercel.app/api/ical/TU_TOKEN.ics`  
 3. Booking → Calendario → Importar → pegá el link · Nombre: **Web De Las Sierras**  
-4. Marca ocupado: reservas activas + blocked manuales (no reexporta lo importado de Booking)
+4. Marca ocupado: reservas activas + blocked manuales (ASCII, all-day DATE; no reexporta lo de Booking)
 
 **Booking → Web (import)**  
 1. `BOOKING_ICAL_URL=https://ical.booking.com/v1/export?t=…` en Vercel  
