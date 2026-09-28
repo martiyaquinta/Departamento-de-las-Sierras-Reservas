@@ -118,6 +118,7 @@ pnpm start
 | `/reservar` | Flujo de reserva |
 | `/reserva/[code]` | Estado (ej. `DS-7K2P`) |
 | `/gracias` | Post-envío + WhatsApp |
+| `/api/calendar/export.ics?token=…` | iCal de ocupación (Booking/Airbnb import) |
 | `/admin/login` | Login |
 | `/admin` | Dashboard |
 | `/admin/reservas` | Confirmar / rechazar |
@@ -125,8 +126,18 @@ pnpm start
 | `/admin/fotos` | Upload / orden / cover |
 | `/admin/precio` | Precio y fees (persiste en DB → web) |
 | `/admin/contenido` | Textos, amenities, WA |
-| `/admin/ajustes` | Push notifications + cuenta |
+| `/admin/ajustes` | Push + iCal link + cuenta |
 | `/offline` | Fallback PWA |
+
+### Sync iCal → Booking
+
+1. En Vercel seteá `ICAL_EXPORT_TOKEN` (string largo, min 16) + `NEXT_PUBLIC_SITE_URL=https://departamentodelassierras.vercel.app`
+2. Redeploy
+3. Link: `https://departamentodelassierras.vercel.app/api/calendar/export.ics?token=TU_TOKEN`
+4. En Booking → Calendario → Sincronizar → Importar calendario → pegá el link
+5. Nombre: **Web De Las Sierras**
+
+El feed marca ocupado: reservas confirmed + pending con hold, y noches `blocked` del admin. No expone datos del huésped.
 
 ## Reglas de negocio v1
 
