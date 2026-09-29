@@ -151,17 +151,11 @@ export async function setAvailabilityRangeAction(raw: unknown): Promise<ActionRe
       return { ok: true };
     }
 
-    await requireAdmin();
-    // service role: admin already validated; avoids RLS edge cases on upsert
-    const supabase = createServiceClient();
-    const resolvedNote =
-      note ||
-      (status === "blocked" ? "offline-manual" : null);
+    const supabase = await requireAdmin();
     const rows = dates.map((night_date) => ({
       night_date,
       status,
-      // Liberar: limpia nota de bloqueo offline / booking-ical no aplica acá
-      note: status === "available" ? null : resolvedNote,
+      note: note || null,
       updated_at: new Date().toISOString(),
     }));
 
@@ -193,13 +187,11 @@ export async function toggleAvailabilityDayAction(
       return { ok: true };
     }
 
-    await requireAdmin();
-    const supabase = createServiceClient();
+    const supabase = await requireAdmin();
     const { error } = await supabase.from("availability").upsert(
       {
         night_date: nightDate,
         status: nextStatus,
-        note: nextStatus === "blocked" ? "offline-manual" : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "night_date" }
@@ -208,7 +200,6 @@ export async function toggleAvailabilityDayAction(
     revalidatePath("/reservar");
     revalidatePath("/admin/calendario");
     revalidatePath("/admin");
-    revalidatePath("/");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Error" };
