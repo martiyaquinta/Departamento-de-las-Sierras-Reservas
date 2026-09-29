@@ -95,8 +95,10 @@ export function CalendarioAdmin({
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Tocá un día para alternar libre ↔ ocupado. O elegí un rango y usá los botones.
-        El rojo de reserva no se edita acá (va en Reservas).
+        Tocá un día para alternar libre ↔ cerrado. O elegí un rango y usá los botones.
+        <strong className="font-medium text-marron"> Reserva fuera de la web:</strong>{" "}
+        “Marcar ocupado / cerrado” (gris). No crees una reserva en la app.
+        El rojo es solo reserva hecha por la web (se gestiona en Reservas).
       </p>
 
       <div className="flex flex-wrap gap-2 text-xs sm:gap-3">
