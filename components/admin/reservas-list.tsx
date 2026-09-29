@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ const variants: Record<
 };
 
 export function ReservasList({ reservations }: { reservations: Reservation[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<"all" | ReservationStatus>("all");
   const [pending, startTransition] = useTransition();
 
@@ -51,7 +53,12 @@ export function ReservasList({ reservations }: { reservations: Reservation[] }) 
     startTransition(async () => {
       const res = await updateReservationStatusAction({ id, status });
       if (!res.ok) toast.error(res.error);
-      else toast.success(status === "confirmed" ? "Confirmada" : status === "rejected" ? "Rechazada" : "Cancelada");
+      else {
+        toast.success(
+          status === "confirmed" ? "Confirmada" : status === "rejected" ? "Rechazada" : "Cancelada"
+        );
+        router.refresh();
+      }
     });
   }
 
