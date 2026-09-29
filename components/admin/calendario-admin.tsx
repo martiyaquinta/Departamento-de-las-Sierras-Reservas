@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
@@ -22,7 +21,6 @@ export function CalendarioAdmin({
   availability: Availability[];
   bookedNights: string[];
 }) {
-  const router = useRouter();
   const [range, setRange] = useState<DateRange | undefined>();
   const [pending, startTransition] = useTransition();
 
@@ -69,7 +67,6 @@ export function CalendarioAdmin({
       else {
         toast.success(status === "available" ? "Marcado libre" : "Marcado ocupado/bloqueado");
         setRange(undefined);
-        router.refresh();
       }
     });
   }
@@ -85,10 +82,7 @@ export function CalendarioAdmin({
     startTransition(async () => {
       const res = await toggleAvailabilityDayAction(key, next);
       if (!res.ok) toast.error(res.error);
-      else {
-        toast.success(next === "available" ? `${key}: libre` : `${key}: ocupado`);
-        router.refresh();
-      }
+      else toast.success(next === "available" ? `${key}: libre` : `${key}: ocupado`);
     });
   }
 
