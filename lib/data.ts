@@ -112,7 +112,15 @@ export async function getActiveReservationsForBooking(): Promise<
       }));
   }
   try {
-    const supabase = await createClient();
+    // Service role: RLS on reservations is admin-only. Public /reservar and
+    // createReservationAction must still see confirmed/pending holds or the
+    // calendar shows free nights and allows double-booking.
+    let supabase;
+    try {
+      supabase = createServiceClient();
+    } catch {
+      supabase = await createClient();
+    }
     const { data, error } = await supabase
       .from("reservations")
       .select("check_in, check_out, status, hold_until")
