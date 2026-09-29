@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ export function CalendarioAdmin({
   availability: Availability[];
   bookedNights: string[];
 }) {
+  const router = useRouter();
   const [range, setRange] = useState<DateRange | undefined>();
   const [pending, startTransition] = useTransition();
 
@@ -67,6 +69,7 @@ export function CalendarioAdmin({
       else {
         toast.success(status === "available" ? "Marcado libre" : "Marcado ocupado/bloqueado");
         setRange(undefined);
+        router.refresh();
       }
     });
   }
@@ -82,15 +85,20 @@ export function CalendarioAdmin({
     startTransition(async () => {
       const res = await toggleAvailabilityDayAction(key, next);
       if (!res.ok) toast.error(res.error);
-      else toast.success(next === "available" ? `${key}: libre` : `${key}: ocupado`);
+      else {
+        toast.success(next === "available" ? `${key}: libre` : `${key}: ocupado`);
+        router.refresh();
+      }
     });
   }
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Tocá un día para alternar libre ↔ ocupado. O elegí un rango y usá los botones.
-        El rojo de reserva no se edita acá (va en Reservas).
+        Tocá un día para alternar libre ↔ cerrado. O elegí un rango y usá los botones.
+        <strong className="font-medium text-marron"> Reserva fuera de la web:</strong>{" "}
+        “Marcar ocupado / cerrado” (gris). No crees una reserva en la app.
+        El rojo es solo reserva hecha por la web (se gestiona en Reservas).
       </p>
 
       <div className="flex flex-wrap gap-2 text-xs sm:gap-3">
