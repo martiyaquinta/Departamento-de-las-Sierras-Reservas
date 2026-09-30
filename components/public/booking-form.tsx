@@ -219,12 +219,12 @@ export function BookingForm({
       <Card className="border-primary/30 bg-crema">
         <CardContent className="space-y-3 pt-5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">1 noche</span>
-            <span>{formatARS(oneNightArs)}</span>
+            <span className="text-muted-foreground">2 o más noches</span>
+            <span className="font-medium">{formatARS(pricePerNight)} / noche</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">2 o más noches</span>
-            <span>{formatARS(pricePerNight)} / noche</span>
+            <span className="text-muted-foreground">1 noche</span>
+            <span>{formatARS(oneNightArs)}</span>
           </div>
           {minNights > 1 && (
             <p className="text-xs text-muted-foreground">Mínimo {minNights} noches</p>

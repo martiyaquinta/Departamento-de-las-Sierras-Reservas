@@ -3,12 +3,12 @@ import { formatARS } from "@/lib/utils";
 
 export function StickyCta({
   priceFrom,
-  priceMulti,
+  priceOneNight,
 }: {
-  /** ARS · 1 noche (o "desde") */
+  /** ARS · tarifa “desde” (2+ noches / noche) */
   priceFrom: number;
-  /** ARS · 2+ por noche */
-  priceMulti?: number;
+  /** ARS · 1 noche (más cara); opcional */
+  priceOneNight?: number | null;
 }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-crema/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
@@ -17,11 +17,14 @@ export function StickyCta({
           <p className="text-xs text-muted-foreground">Desde</p>
           <p className="truncate font-semibold text-marron">
             {formatARS(priceFrom)}
-            <span className="text-xs font-normal text-muted-foreground"> · 1 noche</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {" "}
+              / noche · 2+
+            </span>
           </p>
-          {priceMulti != null && priceMulti > 0 && (
+          {priceOneNight != null && priceOneNight > 0 && (
             <p className="truncate text-xs text-muted-foreground">
-              {formatARS(priceMulti)} / noche · 2+
+              {formatARS(priceOneNight)} · 1 noche
             </p>
           )}
         </div>
