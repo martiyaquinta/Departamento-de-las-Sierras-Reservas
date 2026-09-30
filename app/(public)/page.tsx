@@ -94,7 +94,7 @@ export default async function HomePage() {
         <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { icon: CalendarDays, label: "Finde", sub: "Entra vie · sale dom" },
-            { icon: Users, label: "2 a 3", sub: "2 adultos + 1 menor" },
+            { icon: Users, label: "2 a 3", sub: "personas" },
             { icon: MapPin, label: "Cerquita de todo", sub: "Centro, dique y calvario" },
             { icon: Mountain, label: "Tandil", sub: "sierras cerca" },
           ].map((h) => (
@@ -163,22 +163,23 @@ export default async function HomePage() {
             <CardContent className="space-y-3 p-5">
               <h2 className="font-serif text-xl font-semibold">Precio</h2>
               <div className="space-y-1">
+                {/* Primero la tarifa más barata (2+ noches) — es el “desde” real del finde */}
                 <p className="text-3xl font-bold text-primary">
+                  {formatARS(property.price_per_night)}
+                  <span className="text-base font-normal text-muted-foreground">
+                    {" "}
+                    / noche · 2 o más noches
+                  </span>
+                </p>
+                <p className="text-lg font-semibold text-marron">
                   {formatARS(
                     property.price_one_night != null && property.price_one_night > 0
                       ? property.price_one_night
                       : property.price_per_night
                   )}
-                  <span className="text-base font-normal text-muted-foreground">
-                    {" "}
-                    · 1 noche
-                  </span>
-                </p>
-                <p className="text-lg font-semibold text-marron">
-                  {formatARS(property.price_per_night)}
                   <span className="text-sm font-normal text-muted-foreground">
                     {" "}
-                    / noche · 2 o más noches
+                    · 1 noche
                   </span>
                 </p>
               </div>
@@ -187,7 +188,9 @@ export default async function HomePage() {
                   + limpieza {formatARS(property.cleaning_fee)}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">Montos en pesos argentinos.</p>
+              <p className="text-xs text-muted-foreground">
+                Montos en pesos. El finde típico (vie–dom) son 2 noches a la tarifa más baja.
+              </p>
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/reservar">Ver disponibilidad</Link>
               </Button>
@@ -248,12 +251,12 @@ export default async function HomePage() {
       </div>
 
       <StickyCta
-        priceFrom={
+        priceFrom={property.price_per_night}
+        priceOneNight={
           property.price_one_night != null && property.price_one_night > 0
             ? property.price_one_night
-            : property.price_per_night
+            : null
         }
-        priceMulti={property.price_per_night}
       />
     </>
   );

@@ -11,7 +11,7 @@ export const DEMO_PROPERTY: Property = {
   name: "Departamento de las Sierras",
   tagline: "Una estadía cálida en el centro de Tandil, cerquita de todo.",
   description:
-    "Hola! Departamento de las Sierras te ofrece una cálida estadía en Tandil con la mejor ubicación, cerquita de todo!! Centro, dique, parque y calvario.\n\nEstá equipado para 2 a 3 personas máximo (2 adultos y un menor).",
+    "Hola! Departamento de las Sierras te ofrece una cálida estadía en Tandil con la mejor ubicación, cerquita de todo!! Centro, dique, parque y calvario.\n\nEstá equipado para 2 a 3 personas.",
   address_text: "San Martín e Yrigoyen, Tandil",
   maps_url: "https://maps.google.com/?q=San+Martin+e+Yrigoyen,+Tandil",
   whatsapp_e164: "5492266515776",
