@@ -157,39 +157,79 @@ export default async function HomePage() {
           <Gallery photos={photos} />
         </section>
 
-        {/* Price */}
+        {/* Price — promo “estadía prolongada” */}
         <section className="mb-8">
-          <Card className="border-primary/25 bg-gradient-to-br from-crema to-arena">
-            <CardContent className="space-y-3 p-5">
-              <h2 className="font-serif text-xl font-semibold">Precio</h2>
-              <div className="space-y-1">
-                {/* Primero la tarifa más barata (2+ noches) — es el “desde” real del finde */}
-                <p className="text-3xl font-bold text-primary">
-                  {formatARS(property.price_per_night)}
-                  <span className="text-base font-normal text-muted-foreground">
-                    {" "}
-                    / noche · 2 o más noches
-                  </span>
-                </p>
-                <p className="text-lg font-semibold text-marron">
-                  {formatARS(
-                    property.price_one_night != null && property.price_one_night > 0
-                      ? property.price_one_night
-                      : property.price_per_night
-                  )}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    · 1 noche
-                  </span>
-                </p>
+          <Card className="border-primary/30 bg-gradient-to-br from-crema to-arena shadow-sm">
+            <CardContent className="space-y-4 p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="font-serif text-xl font-semibold">Precio</h2>
+                <Badge className="bg-primary text-primary-foreground">
+                  Descuento por estadía prolongada
+                </Badge>
               </div>
+
+              {(() => {
+                const oneNight =
+                  property.price_one_night != null && property.price_one_night > 0
+                    ? property.price_one_night
+                    : property.price_per_night;
+                const multi = property.price_per_night;
+                const showPromo = oneNight > multi;
+                const savePct = showPromo
+                  ? Math.round(((oneNight - multi) / oneNight) * 100)
+                  : 0;
+
+                return (
+                  <div className="space-y-3">
+                    <div className="rounded-xl border border-primary/20 bg-background/70 p-4">
+                      <p className="text-xs font-medium uppercase tracking-wide text-primary">
+                        Con 2 o más noches
+                      </p>
+                      <p className="mt-1 text-3xl font-bold text-primary sm:text-4xl">
+                        {formatARS(multi)}
+                        <span className="text-base font-normal text-muted-foreground">
+                          {" "}
+                          / noche
+                        </span>
+                      </p>
+                      {showPromo && (
+                        <p className="mt-1 text-sm font-medium text-marron">
+                          {savePct > 0
+                            ? `${savePct}% menos que la tarifa de 1 noche`
+                            : "Mejor precio por noche"}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="px-1">
+                      <p className="text-sm text-muted-foreground">
+                        Tarifa 1 noche:{" "}
+                        <span
+                          className={
+                            showPromo
+                              ? "font-medium text-muted-foreground line-through decoration-marron/50"
+                              : "font-semibold text-marron"
+                          }
+                        >
+                          {formatARS(oneNight)}
+                        </span>
+                        {showPromo && (
+                          <span className="ml-1 text-xs">(sin descuento)</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {property.cleaning_fee > 0 && (
                 <p className="text-sm text-muted-foreground">
                   + limpieza {formatARS(property.cleaning_fee)}
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
-                Montos en pesos. El finde típico (vie–dom) son 2 noches a la tarifa más baja.
+                Montos en pesos. El finde típico (vie–dom) entra en el descuento por estadía
+                prolongada.
               </p>
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/reservar">Ver disponibilidad</Link>

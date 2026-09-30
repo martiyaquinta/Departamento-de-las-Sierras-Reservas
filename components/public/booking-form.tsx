@@ -218,13 +218,26 @@ export function BookingForm({
 
       <Card className="border-primary/30 bg-crema">
         <CardContent className="space-y-3 pt-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-primary">
+            Descuento por estadía prolongada
+          </p>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">2 o más noches</span>
-            <span className="font-medium">{formatARS(pricePerNight)} / noche</span>
+            <span className="font-semibold text-primary">
+              {formatARS(pricePerNight)} / noche
+            </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">1 noche</span>
-            <span>{formatARS(oneNightArs)}</span>
+            <span className="text-muted-foreground">1 noche (sin descuento)</span>
+            <span
+              className={
+                oneNightArs > pricePerNight
+                  ? "text-muted-foreground line-through decoration-marron/40"
+                  : undefined
+              }
+            >
+              {formatARS(oneNightArs)}
+            </span>
           </div>
           {minNights > 1 && (
             <p className="text-xs text-muted-foreground">Mínimo {minNights} noches</p>
