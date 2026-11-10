@@ -11,7 +11,9 @@ export async function updateSession(request: NextRequest) {
   if (!url || !key) {
     // Sin Supabase no hay admin real
     const path = request.nextUrl.pathname;
-    if (path.startsWith("/admin") && path !== "/admin/login") {
+    const isPublicAdmin =
+      path === "/admin/login" || path === "/admin/reset-password";
+    if (path.startsWith("/admin") && !isPublicAdmin) {
       const redirect = request.nextUrl.clone();
       redirect.pathname = "/admin/login";
       return NextResponse.redirect(redirect);
@@ -41,10 +43,12 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAdminRoute = path.startsWith("/admin");
   const isLogin = path === "/admin/login";
+  const isResetPassword = path === "/admin/reset-password";
+  const isPublicAdmin = isLogin || isResetPassword;
 
   const allowed = isAllowedAdminEmail(user?.email);
 
-  if (isAdminRoute && !isLogin) {
+  if (isAdminRoute && !isPublicAdmin) {
     if (!user || !allowed) {
       // sesión de un mail no autorizado → cerrar
       if (user && !allowed) {

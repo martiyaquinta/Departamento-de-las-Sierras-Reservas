@@ -92,34 +92,26 @@ function escapeHtml(s: string) {
     .replace(/"/g, "&quot;");
 }
 
-/** Mail + Web Push al admin. Nunca tira: loguea y sigue. */
-export async function notifyAdminNewReservation(
-  payload: ReservationNotifyPayload
+export type SendResendEmailInput = {
+  to: string | string[];
+  subject: string;
+  text: string;
+  html: string;
+};
+
+/** Envío Resend compartido. No tira: loguea y devuelve error. */
+export async function sendResendEmail(
+  input: SendResendEmailInput
 ): Promise<{ ok: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.ADMIN_NOTIFY_EMAIL || "centrodelassierras@gmail.com";
   const from =
     process.env.RESEND_FROM_EMAIL ||
     "Departamento de las Sierras <onboarding@resend.dev>";
-
-  const { subject, text, html } = buildReservationEmail(payload);
-  const total = formatMoney(payload.totalAmount, payload.currency || "ARS");
-  const pushBody = `${payload.guestName} · ${payload.checkIn} → ${payload.checkOut} · ${total} · ${payload.publicCode}`;
-
-  const pushPromise = notifyAdminPush({
-    title: `Nueva reserva ${payload.publicCode}`,
-    body: pushBody,
-    url: "/admin/reservas",
-    tag: `sierras-${payload.publicCode}`,
-  });
+  const to = Array.isArray(input.to) ? input.to : [input.to];
 
   if (!apiKey) {
-    console.warn("[notify] RESEND_API_KEY ausente — no se envió mail de reserva", payload.publicCode);
-    const push = await pushPromise;
-    return {
-      ok: push.ok || push.sent > 0,
-      error: push.error ? `mail ausente; push: ${push.error}` : "RESEND_API_KEY ausente",
-    };
+    console.warn("[notify] RESEND_API_KEY ausente — mail no enviado:", input.subject);
+    return { ok: false, error: "RESEND_API_KEY ausente" };
   }
 
   try {
@@ -131,31 +123,64 @@ export async function notifyAdminNewReservation(
       },
       body: JSON.stringify({
         from,
-        to: [to],
-        subject,
-        text,
-        html,
+        to,
+        subject: input.subject,
+        text: input.text,
+        html: input.html,
       }),
     });
     const body = await res.json().catch(() => ({}));
-    const push = await pushPromise;
     if (!res.ok) {
       const msg =
         typeof body === "object" && body && "message" in body
           ? String((body as { message: string }).message)
           : `HTTP ${res.status}`;
       console.error("[notify] Resend error", msg, body);
-      return {
-        ok: push.sent > 0,
-        error: push.sent > 0 ? undefined : msg,
-      };
+      return { ok: false, error: msg };
     }
-    console.info("[notify] mail ok", payload.publicCode, "→", to, "push sent", push.sent);
+    console.info("[notify] mail ok", input.subject, "→", to.join(","));
     return { ok: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "error de red";
     console.error("[notify] exception", msg);
-    const push = await pushPromise;
-    return { ok: push.sent > 0, error: push.sent > 0 ? undefined : msg };
+    return { ok: false, error: msg };
   }
+}
+
+/** Mail + Web Push al admin. Nunca tira: loguea y sigue. */
+export async function notifyAdminNewReservation(
+  payload: ReservationNotifyPayload
+): Promise<{ ok: boolean; error?: string }> {
+  const to = process.env.ADMIN_NOTIFY_EMAIL || "centrodelassierras@gmail.com";
+  const { subject, text, html } = buildReservationEmail(payload);
+  const total = formatMoney(payload.totalAmount, payload.currency || "ARS");
+  const pushBody = `${payload.guestName} · ${payload.checkIn} → ${payload.checkOut} · ${total} · ${payload.publicCode}`;
+
+  const pushPromise = notifyAdminPush({
+    title: `Nueva reserva ${payload.publicCode}`,
+    body: pushBody,
+    url: "/admin/reservas",
+    tag: `sierras-${payload.publicCode}`,
+  });
+
+  const mail = await sendResendEmail({ to, subject, text, html });
+  const push = await pushPromise;
+
+  if (!mail.ok && !(push.ok || push.sent > 0)) {
+    return {
+      ok: false,
+      error: mail.error
+        ? push.error
+          ? `${mail.error}; push: ${push.error}`
+          : mail.error
+        : push.error,
+    };
+  }
+  if (!mail.ok) {
+    return {
+      ok: push.ok || push.sent > 0,
+      error: push.error ? `mail: ${mail.error}; push: ${push.error}` : mail.error,
+    };
+  }
+  return { ok: true };
 }

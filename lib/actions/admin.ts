@@ -20,6 +20,20 @@ import {
   isAllowedAdminEmail,
   normalizeAdminEmail,
 } from "@/lib/admin-allowlist";
+import {
+  hashAdminPassword,
+  resolveAdminLoginPassword,
+} from "@/lib/admin-password";
+import {
+  createResetTokenMaterial,
+  decideAdminPasswordResetRequest,
+  GENERIC_RESET_MESSAGE,
+  hashResetToken,
+  RESET_REQUEST_MAX_PER_HOUR,
+} from "@/lib/admin-password-reset";
+import { buildAdminPasswordResetEmail } from "@/lib/admin-password-reset-email";
+import { consumeValidResetToken } from "@/lib/admin-password-reset-flow";
+import { sendResendEmail } from "@/lib/notify";
 import type { ActionResult } from "@/lib/actions/reservations";
 import { USD_ARS_RATE, usdToArs } from "@/lib/fx";
 import { syncBookingIcal, type BookingSyncResult } from "@/lib/booking-sync";
@@ -319,6 +333,22 @@ export async function reorderPhotoAction(id: string, direction: "up" | "down"): 
   }
 }
 
+async function getAdminPasswordOverrideHash(
+  service: ReturnType<typeof createServiceClient>
+): Promise<string | null> {
+  const { data, error } = await service
+    .from("admin_auth_settings")
+    .select("password_hash")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) {
+    console.error("[admin-auth] override read", error.message);
+    return null;
+  }
+  const hash = data?.password_hash?.trim();
+  return hash || null;
+}
+
 export async function loginAction(
   email: string,
   password: string
@@ -328,17 +358,7 @@ export async function loginAction(
     return { ok: false, error: "Este email no está autorizado como admin" };
   }
 
-  const adminPassword = (process.env.ADMIN_PASSWORD ?? "").trim();
-  if (!adminPassword) {
-    return {
-      ok: false,
-      error:
-        "Falta ADMIN_PASSWORD (local: .env.local · Vercel: Project → Settings → Environment Variables). Guardala, redeploy y probá de nuevo.",
-    };
-  }
-  if (password !== adminPassword) {
-    return { ok: false, error: "Credenciales inválidas" };
-  }
+  const envAdminPassword = (process.env.ADMIN_PASSWORD ?? "").trim();
 
   try {
     if (!isSupabaseConfigured()) {
@@ -350,6 +370,25 @@ export async function loginAction(
     }
 
     const service = createServiceClient();
+    const overrideHash = await getAdminPasswordOverrideHash(service);
+    const resolved = await resolveAdminLoginPassword({
+      plain: password,
+      overrideHash,
+      envAdminPassword,
+    });
+
+    if (!resolved.ok) {
+      if (!overrideHash && !envAdminPassword) {
+        return {
+          ok: false,
+          error:
+            "Falta ADMIN_PASSWORD (local: .env.local · Vercel: Project → Settings → Environment Variables). Guardala, redeploy y probá de nuevo.",
+        };
+      }
+      return { ok: false, error: "Credenciales inválidas" };
+    }
+
+    const authPassword = password;
     const { data: listed, error: listError } =
       await service.auth.admin.listUsers({ page: 1, perPage: 200 });
     if (listError) return { ok: false, error: listError.message };
@@ -361,22 +400,24 @@ export async function loginAction(
     if (!existing) {
       const { error: createError } = await service.auth.admin.createUser({
         email: normalized,
-        password: adminPassword,
+        password: authPassword,
         email_confirm: true,
       });
       if (createError) return { ok: false, error: createError.message };
-    } else {
+    } else if (resolved.source === "env") {
+      // Bootstrap sin override: mantener Auth alineado con env.
       const { error: updateError } = await service.auth.admin.updateUserById(
         existing.id,
-        { password: adminPassword }
+        { password: authPassword }
       );
       if (updateError) return { ok: false, error: updateError.message };
     }
+    // Con override: no reescribir Auth con env; sign-in con la clave tipeada.
 
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signInWithPassword({
       email: normalized,
-      password: adminPassword,
+      password: authPassword,
     });
     if (error) return { ok: false, error: error.message };
     if (!isAllowedAdminEmail(data.user?.email)) {
@@ -387,6 +428,203 @@ export async function loginAction(
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Error de login";
     return { ok: false, error: msg };
+  }
+}
+
+export async function requestAdminPasswordResetAction(
+  email: string
+): Promise<ActionResult<{ message: string }>> {
+  const normalized = normalizeAdminEmail(email);
+  const notifyEmail =
+    (process.env.ADMIN_NOTIFY_EMAIL || "").trim() ||
+    "centrodelassierras@gmail.com";
+  const decision = decideAdminPasswordResetRequest({
+    email: normalized,
+    isAllowlisted: isAllowedAdminEmail(normalized),
+    notifyEmail,
+  });
+
+  if (!decision.shouldSend || !decision.to) {
+    return { ok: true, data: { message: decision.message } };
+  }
+
+  try {
+    if (!isSupabaseConfigured()) {
+      return { ok: true, data: { message: decision.message } };
+    }
+
+    const service = createServiceClient();
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count } = await service
+      .from("admin_password_reset_tokens")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", since);
+
+    if ((count ?? 0) >= RESET_REQUEST_MAX_PER_HOUR) {
+      console.warn("[admin-reset] rate limit hit");
+      return { ok: true, data: { message: decision.message } };
+    }
+
+    const material = createResetTokenMaterial();
+    await service
+      .from("admin_password_reset_tokens")
+      .update({ used_at: new Date().toISOString() })
+      .is("used_at", null);
+
+    const { error: insertError } = await service
+      .from("admin_password_reset_tokens")
+      .insert({
+        token_hash: material.tokenHash,
+        expires_at: material.expiresAt.toISOString(),
+      });
+    if (insertError) {
+      console.error("[admin-reset] insert token", insertError.message);
+      return { ok: true, data: { message: decision.message } };
+    }
+
+    const site =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+      "http://localhost:3000";
+    const resetUrl = `${site}/admin/reset-password?token=${encodeURIComponent(material.token)}`;
+    const mail = buildAdminPasswordResetEmail({
+      resetUrl,
+      siteName: "De Las Sierras",
+    });
+    const sent = await sendResendEmail({
+      to: decision.to,
+      subject: mail.subject,
+      text: mail.text,
+      html: mail.html,
+    });
+    if (!sent.ok) {
+      console.error("[admin-reset] mail failed", sent.error);
+      if (
+        process.env.NODE_ENV === "development" &&
+        sent.error === "RESEND_API_KEY ausente"
+      ) {
+        console.info("[admin-reset] dev resetUrl", resetUrl);
+      }
+    }
+
+    return { ok: true, data: { message: GENERIC_RESET_MESSAGE } };
+  } catch (e) {
+    console.error(
+      "[admin-reset] request",
+      e instanceof Error ? e.message : e
+    );
+    return { ok: true, data: { message: GENERIC_RESET_MESSAGE } };
+  }
+}
+
+export async function getAdminResetTokenStatusAction(
+  token: string
+): Promise<{ valid: boolean; error?: string }> {
+  if (!token?.trim()) return { valid: false, error: "Enlace inválido" };
+  try {
+    if (!isSupabaseConfigured()) {
+      return { valid: false, error: "Servicio no disponible" };
+    }
+    const service = createServiceClient();
+    const tokenHash = hashResetToken(token);
+    const { data } = await service
+      .from("admin_password_reset_tokens")
+      .select("id, expires_at, used_at")
+      .eq("token_hash", tokenHash)
+      .maybeSingle();
+    if (!data || data.used_at) {
+      return { valid: false, error: "Enlace inválido o ya usado" };
+    }
+    if (new Date(data.expires_at).getTime() <= Date.now()) {
+      return { valid: false, error: "El enlace expiró. Pedí uno nuevo." };
+    }
+    return { valid: true };
+  } catch {
+    return { valid: false, error: "No se pudo validar el enlace" };
+  }
+}
+
+export async function resetAdminPasswordAction(
+  token: string,
+  newPassword: string,
+  confirmPassword: string
+): Promise<ActionResult> {
+  try {
+    if (!isSupabaseConfigured()) {
+      return { ok: false, error: "Supabase no configurado" };
+    }
+    const service = createServiceClient();
+
+    const result = await consumeValidResetToken({
+      tokenPlain: token,
+      newPassword,
+      confirmPassword,
+      store: {
+        async findActiveByHash(hash) {
+          const { data } = await service
+            .from("admin_password_reset_tokens")
+            .select("id, token_hash, expires_at, used_at")
+            .eq("token_hash", hash)
+            .maybeSingle();
+          if (!data) return null;
+          return {
+            id: data.id,
+            token_hash: data.token_hash,
+            expires_at: data.expires_at,
+            used_at: data.used_at,
+          };
+        },
+        async markUsed(id) {
+          await service
+            .from("admin_password_reset_tokens")
+            .update({ used_at: new Date().toISOString() })
+            .eq("id", id);
+        },
+      },
+      async setPassword(plain) {
+        const passwordHash = await hashAdminPassword(plain);
+        const { error: upsertError } = await service
+          .from("admin_auth_settings")
+          .upsert(
+            {
+              id: 1,
+              password_hash: passwordHash,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "id" }
+          );
+        if (upsertError) throw new Error(upsertError.message);
+
+        const adminEmail = "centrodelassierras@gmail.com";
+        const { data: listed, error: listError } =
+          await service.auth.admin.listUsers({ page: 1, perPage: 200 });
+        if (listError) throw new Error(listError.message);
+        const existing = listed.users.find(
+          (u) => normalizeAdminEmail(u.email ?? "") === adminEmail
+        );
+        if (existing) {
+          const { error } = await service.auth.admin.updateUserById(
+            existing.id,
+            { password: plain }
+          );
+          if (error) throw new Error(error.message);
+        } else {
+          const { error } = await service.auth.admin.createUser({
+            email: adminEmail,
+            password: plain,
+            email_confirm: true,
+          });
+          if (error) throw new Error(error.message);
+        }
+      },
+    });
+
+    if (!result.ok) return { ok: false, error: result.error };
+    return { ok: true };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "No se pudo restablecer",
+    };
   }
 }
 
