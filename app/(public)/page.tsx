@@ -32,22 +32,22 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero — mobile-first full bleed */}
-      <section className="relative isolate min-h-[min(88dvh,640px)] w-full sm:min-h-[78vh]">
+      {/* Hero — foto vertical (header.jpg 720×1280) */}
+      <section className="relative isolate min-h-[min(92dvh,720px)] w-full overflow-hidden bg-ink sm:min-h-[85vh]">
         <Image
           src={hero}
           alt={property.name}
           fill
-          className="object-cover object-[center_35%] sm:object-center"
+          className="object-cover object-center"
           sizes="100vw"
           priority
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10"
+          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/15"
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto flex min-h-[min(88dvh,640px)] max-w-5xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[78vh] sm:px-6 sm:pb-16">
+        <div className="relative z-10 mx-auto flex min-h-[min(92dvh,720px)] max-w-5xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[85vh] sm:px-6 sm:pb-16">
           <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-white/85 sm:mb-3 sm:text-xs sm:tracking-[0.18em]">
             Tandil · centro
           </p>
