@@ -22,22 +22,22 @@ export default async function ReservarPage() {
   const booked = buildBookedNightSet(active);
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-16 pt-8 sm:px-6">
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-terracota">
+    <div className="mx-auto max-w-lg px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 sm:px-6 sm:pb-16 sm:pt-8">
+      <p className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-terracota sm:mb-2 sm:text-xs">
         Reserva
       </p>
-      <h1 className="font-serif text-3xl font-semibold tracking-tight text-marron sm:text-4xl">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
         Reservá tu finde
       </h1>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground sm:mt-3">
         Findes: entrás viernes y te vas domingo (2 noches). Si hay puente, abrimos los días
         extra.
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
-        Capacidad: <span className="font-medium text-marron">2 a 3 personas</span>
+        Capacidad: <span className="font-medium text-ink">2 a 3 personas</span>
       </p>
 
-      <div className="mt-8">
+      <div className="mt-6 sm:mt-8">
         <BookingForm
           availability={availability}
           bookedNights={[...booked]}
@@ -51,7 +51,7 @@ export default async function ReservarPage() {
         />
       </div>
 
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="mt-6 text-center text-sm text-muted-foreground sm:mt-8">
         <Link href="/" className="font-medium text-terracota hover:underline">
           ← Volver al depto
         </Link>

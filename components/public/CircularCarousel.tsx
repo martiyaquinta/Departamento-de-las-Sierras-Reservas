@@ -349,7 +349,7 @@ export default function CircularCarousel({
         className
       )}
       style={{
-        height: Math.max(cardH * 1.65, 520),
+        height: Math.max(cardH * 1.45, 360),
         perspective: `${perspective}px`,
         perspectiveOrigin: "50% 48%",
         touchAction: "none",

@@ -32,41 +32,42 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative isolate min-h-[72vh] w-full sm:min-h-[78vh]">
+      {/* Hero — mobile-first full bleed */}
+      <section className="relative isolate min-h-[min(88dvh,640px)] w-full sm:min-h-[78vh]">
         <Image
           src={hero}
           alt={property.name}
           fill
-          className="object-cover object-center"
+          className="object-cover object-[center_35%] sm:object-center"
           sizes="100vw"
           priority
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/5"
+          className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10"
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-end px-4 pb-12 pt-24 sm:min-h-[78vh] sm:px-6 sm:pb-16">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/85">
+        <div className="relative z-10 mx-auto flex min-h-[min(88dvh,640px)] max-w-5xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[78vh] sm:px-6 sm:pb-16">
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-white/85 sm:mb-3 sm:text-xs sm:tracking-[0.18em]">
             Tandil · centro
           </p>
-          <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
+          <h1 className="max-w-2xl font-display text-[1.85rem] font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl">
             {property.name}
           </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-white/90 sm:text-lg">
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-white/90 sm:mt-4 sm:text-lg">
             {property.tagline ??
               "Tu escapada de fin de semana a las sierras — vista desde el balcón, a pasos del centro."}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-3">
             <Link
               href="/reservar"
-              className="inline-flex min-h-12 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-white/95"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-white/95 sm:w-auto"
             >
               Reservar finde
             </Link>
             <a
               href="#fotos"
-              className="inline-flex min-h-12 items-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10 sm:w-auto"
             >
               Ver fotos
             </a>
@@ -74,19 +75,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-5xl px-4 pb-28 pt-10 sm:px-6 sm:pt-14">
-        <section className="mb-14 border-b border-line pb-10">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+      <div className="mx-auto max-w-5xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-8 sm:px-6 sm:pb-28 sm:pt-14">
+        {/* Intro + chips */}
+        <section className="mb-10 border-b border-line pb-8 sm:mb-14 sm:pb-10">
+          <div className="flex flex-col gap-5 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Un depto para el finde, en el centro
               </h2>
-              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:text-base">
                 Vista a las sierras desde el balcón · San Martín e Yrigoyen · se camina a
                 dique, parque y calvario.
               </p>
             </div>
-            <ul className="flex flex-wrap gap-2">
+            <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
               {[
                 "2 a 3 personas",
                 "Solo findes · vie → dom",
@@ -95,7 +97,7 @@ export default async function HomePage() {
               ].map((chip) => (
                 <li
                   key={chip}
-                  className="rounded-full border border-line bg-transparent px-3.5 py-1.5 text-sm text-ink"
+                  className="shrink-0 rounded-full border border-line bg-transparent px-3 py-1.5 text-xs text-ink sm:px-3.5 sm:text-sm"
                 >
                   {chip}
                 </li>
@@ -104,79 +106,85 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="fotos" className="mb-16 scroll-mt-20">
-          <div className="mb-5 flex items-baseline justify-between gap-4">
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+        {/* Fotos */}
+        <section id="fotos" className="mb-12 scroll-mt-16 sm:mb-16 sm:scroll-mt-20">
+          <div className="mb-4 flex items-baseline justify-between gap-3 sm:mb-5">
+            <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
               El lugar
             </h2>
-            <p className="text-sm text-muted-foreground">{LOCAL_PHOTOS.length} fotos</p>
+            <p className="text-xs text-muted-foreground sm:text-sm">{LOCAL_PHOTOS.length} fotos</p>
           </div>
           <Gallery items={photoItems} />
+          <p className="mt-2 text-center text-[11px] text-muted-foreground sm:hidden">
+            Deslizá para ver más fotos
+          </p>
         </section>
 
+        {/* Videos */}
         {LOCAL_VIDEOS.length > 0 && (
-          <section id="videos" className="mb-16 scroll-mt-20">
-            <div className="mb-5 flex items-baseline justify-between gap-4">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          <section id="videos" className="mb-12 scroll-mt-16 sm:mb-16 sm:scroll-mt-20">
+            <div className="mb-4 flex items-baseline justify-between gap-3 sm:mb-5">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Videos
               </h2>
-              <p className="text-sm text-muted-foreground">{LOCAL_VIDEOS.length} clips</p>
+              <p className="text-xs text-muted-foreground sm:text-sm">{LOCAL_VIDEOS.length} clips</p>
             </div>
             <VideoGallery videos={LOCAL_VIDEOS} />
           </section>
         )}
 
-        <section className="mb-16">
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+        {/* Historia */}
+        <section className="mb-12 sm:mb-16">
+          <div className="grid gap-6 sm:gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-5">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Cómo es quedarse acá
               </h2>
               {property.description ? (
-                <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-foreground/90">
+                <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-foreground/90 sm:mt-4 sm:text-base">
                   {property.description}
                 </p>
               ) : (
-                <p className="mt-4 text-base leading-relaxed text-foreground/90">
+                <p className="mt-3 text-[15px] leading-relaxed text-foreground/90 sm:mt-4 sm:text-base">
                   Depto equipado para 2 a 3 personas, en pleno centro de Tandil. Ideal para
                   un finde: llegás viernes, te vas domingo.
                 </p>
               )}
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-3 text-sm text-muted-foreground sm:mt-4">
                 Check-in {property.check_in_time ?? "15:00"} · Check-out{" "}
                 {property.check_out_time ?? "11:00"}
               </p>
             </div>
-            <div className="space-y-4 lg:col-span-7">
-              <div className="relative aspect-[16/10] overflow-hidden bg-transparent">
+            <div className="lg:col-span-7">
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-transparent">
                 <Image
                   src={storyA}
                   alt="Interior del departamento"
                   fill
-                  className="object-contain sm:object-cover"
+                  className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 55vw"
                 />
               </div>
             </div>
           </div>
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="mt-8 grid gap-6 sm:mt-10 sm:gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="order-2 lg:order-1 lg:col-span-7">
-              <div className="relative mx-auto aspect-[3/4] max-h-[560px] w-full max-w-md overflow-hidden bg-transparent lg:mx-0 lg:max-w-none">
+              <div className="relative mx-auto aspect-[3/4] max-h-[min(70vw,420px)] w-full max-w-sm overflow-hidden bg-transparent sm:max-h-[560px] lg:mx-0 lg:max-w-none">
                 <Image
                   src={storyB}
                   alt="Ambiente del departamento"
                   fill
-                  className="object-contain"
+                  className="object-cover sm:object-contain"
                   sizes="(max-width: 1024px) 100vw, 40vw"
                 />
               </div>
             </div>
             <div className="order-1 flex flex-col justify-center lg:order-2 lg:col-span-5">
-              <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
+              <h3 className="font-display text-lg font-semibold text-ink sm:text-2xl">
                 Centro caminable
               </h3>
-              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:text-base">
                 {property.address_text ?? "San Martín e Yrigoyen, Tandil"}. Desde acá llegás
                 a pie al dique, al parque Independencia y al Calvario. El finde se arma sin
                 auto si querés.
@@ -186,7 +194,7 @@ export default async function HomePage() {
                   href={property.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-terracota underline-offset-4 hover:underline"
+                  className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-terracota underline-offset-4 hover:underline sm:mt-5"
                 >
                   Abrir en Google Maps
                 </a>
@@ -195,44 +203,46 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Amenities */}
         {property.amenities.length > 0 && (
-          <section className="mb-16 border-y border-line py-12">
-            <h2 className="mb-6 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          <section className="mb-12 border-y border-line py-8 sm:mb-16 sm:py-12">
+            <h2 className="mb-4 font-display text-xl font-semibold tracking-tight text-ink sm:mb-6 sm:text-3xl">
               Qué hay en el depto
             </h2>
             <ul className="columns-1 gap-x-12 sm:columns-2">
               {property.amenities.map((a) => (
                 <li
                   key={a}
-                  className="mb-2.5 break-inside-avoid border-b border-line py-2 text-[15px] leading-snug text-foreground/90"
+                  className="mb-2 break-inside-avoid border-b border-line py-2 text-sm leading-snug text-foreground/90 sm:text-[15px]"
                 >
                   {a}
                 </li>
               ))}
             </ul>
-            <p className="mt-6 text-sm text-muted-foreground">No se aceptan mascotas.</p>
+            <p className="mt-5 text-sm text-muted-foreground sm:mt-6">No se aceptan mascotas.</p>
           </section>
         )}
 
-        <section className="mb-16">
-          <div className="border border-line bg-transparent px-5 py-8 sm:px-10 sm:py-10">
-            <div className="flex flex-wrap items-center gap-3">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+        {/* Precio */}
+        <section className="mb-12 sm:mb-16">
+          <div className="border border-line bg-transparent px-4 py-6 sm:px-10 sm:py-10">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Precio
               </h2>
-              <span className="rounded-full bg-terracota px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+              <span className="w-fit rounded-full bg-terracota px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white sm:px-3 sm:text-xs">
                 Descuento por estadía prolongada
               </span>
             </div>
 
-            <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
+            <div className="mt-6 grid gap-6 sm:mt-8 sm:grid-cols-[1fr_auto] sm:items-end sm:gap-8">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-terracota">
+                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-terracota sm:text-xs">
                   Con 2 o más noches
                 </p>
-                <p className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+                <p className="mt-1.5 font-display text-3xl font-semibold tracking-tight text-ink sm:mt-2 sm:text-5xl">
                   {formatARS(multi)}
-                  <span className="ml-2 font-sans text-base font-normal text-muted-foreground">
+                  <span className="ml-1.5 font-sans text-sm font-normal text-muted-foreground sm:ml-2 sm:text-base">
                     / noche
                   </span>
                 </p>
@@ -243,13 +253,11 @@ export default async function HomePage() {
                       : "Mejor precio por noche"}
                   </p>
                 )}
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground sm:mt-4">
                   Tarifa 1 noche:{" "}
                   <span
                     className={
-                      showPromo
-                        ? "line-through decoration-ink/40"
-                        : "font-semibold text-ink"
+                      showPromo ? "line-through decoration-ink/40" : "font-semibold text-ink"
                     }
                   >
                     {formatARS(oneNight)}
@@ -278,8 +286,8 @@ export default async function HomePage() {
         </section>
 
         {property.house_rules && (
-          <section className="mb-16">
-            <h2 className="mb-3 font-display text-xl font-semibold text-ink sm:text-2xl">
+          <section className="mb-12 sm:mb-16">
+            <h2 className="mb-2.5 font-display text-lg font-semibold text-ink sm:mb-3 sm:text-2xl">
               Para que estemos bien
             </h2>
             <p className="max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -288,7 +296,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        <section className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <section className="mb-8 flex flex-col gap-2.5 sm:mb-10 sm:flex-row sm:items-center sm:gap-3">
           <Link
             href="/reservar"
             className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-ink/90"
@@ -307,9 +315,9 @@ export default async function HomePage() {
           )}
         </section>
 
-        <footer className="border-t border-line pt-8 text-sm text-muted-foreground">
+        <footer className="border-t border-line pt-6 text-sm text-muted-foreground sm:pt-8">
           <p className="font-display text-base font-semibold text-ink">De Las Sierras</p>
-          <p className="mt-2">{property.address_text ?? "San Martín e Yrigoyen, Tandil"}</p>
+          <p className="mt-1.5 sm:mt-2">{property.address_text ?? "San Martín e Yrigoyen, Tandil"}</p>
           {wa && (
             <a
               href={wa}
