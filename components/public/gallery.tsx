@@ -31,13 +31,13 @@ export function Gallery({ photos }: { photos: Photo[] }) {
 
   if (!list.length) {
     return (
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-arena">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-arena">
         <Image
           src="/brand/logo-beige.png"
           alt="Departamento de las Sierras"
           fill
           className="object-contain p-8"
-          sizes="(max-width: 768px) 100vw, 720px"
+          sizes="(max-width: 768px) 100vw, 960px"
           priority
         />
       </div>
@@ -48,13 +48,13 @@ export function Gallery({ photos }: { photos: Photo[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-arena">
+      <div className="group relative aspect-[4/3] overflow-hidden rounded-sm bg-arena sm:aspect-[16/10]">
         <Image
           src={photoPublicUrl(main.storage_path)}
           alt={main.alt ?? "Foto del departamento"}
           fill
-          className="object-cover transition-opacity duration-300"
-          sizes="(max-width: 768px) 100vw, 720px"
+          className="object-cover photo-hover"
+          sizes="(max-width: 768px) 100vw, 960px"
           priority
         />
 
@@ -64,7 +64,7 @@ export function Gallery({ photos }: { photos: Photo[] }) {
               type="button"
               aria-label="Foto anterior"
               onClick={() => go(-1)}
-              className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 text-marron shadow-md backdrop-blur-sm transition hover:bg-background sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute left-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-crema/95 text-marron shadow-md transition hover:bg-crema sm:opacity-0 sm:group-hover:opacity-100"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -72,39 +72,28 @@ export function Gallery({ photos }: { photos: Photo[] }) {
               type="button"
               aria-label="Foto siguiente"
               onClick={() => go(1)}
-              className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 text-marron shadow-md backdrop-blur-sm transition hover:bg-background sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute right-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-crema/95 text-marron shadow-md transition hover:bg-crema sm:opacity-0 sm:group-hover:opacity-100"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
 
-            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-              {list.map((p, i) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  aria-label={`Ir a foto ${i + 1}`}
-                  onClick={() => setActive(i)}
-                  className={cn(
-                    "h-2 rounded-full transition-all",
-                    i === active ? "w-5 bg-primary" : "w-2 bg-background/70 hover:bg-background"
-                  )}
-                />
-              ))}
-            </div>
+            <p className="absolute bottom-3 right-3 z-10 rounded-full bg-marron/80 px-3 py-1 text-xs font-medium text-crema">
+              {active + 1} / {list.length}
+            </p>
           </>
         )}
       </div>
 
       {list.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {list.map((p, i) => (
             <button
               key={p.id}
               type="button"
               onClick={() => setActive(i)}
               className={cn(
-                "relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2",
-                i === active ? "border-primary" : "border-transparent opacity-80"
+                "relative h-20 w-24 shrink-0 overflow-hidden rounded-sm ring-offset-2 ring-offset-background transition sm:h-24 sm:w-28",
+                i === active ? "ring-2 ring-marron" : "opacity-75 hover:opacity-100"
               )}
             >
               <Image
@@ -112,7 +101,7 @@ export function Gallery({ photos }: { photos: Photo[] }) {
                 alt={p.alt ?? ""}
                 fill
                 className="object-cover"
-                sizes="80px"
+                sizes="112px"
               />
             </button>
           ))}

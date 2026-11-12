@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito_Sans } from "next/font/google";
+import { DM_Sans, Fraunces } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
@@ -10,8 +10,8 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const nunito = Nunito_Sans({
-  variable: "--font-nunito",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
   display: "swap",
 });
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Las Sierras",
   },
   description:
-    "Escapada de finde con vista a las sierras, en pleno centro de Tandil. Hasta 3 personas. Reservá online.",
+    "Finde en Tandil con vista a las sierras, en San Martín e Yrigoyen. 2 a 3 personas. Reservá online.",
   applicationName: "Departamento de las Sierras",
   appleWebApp: {
     capable: true,
@@ -53,7 +53,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-AR">
-      <body className={`${fraunces.variable} ${nunito.variable} min-h-dvh antialiased`}>
+      <body className={`${fraunces.variable} ${dmSans.variable} min-h-dvh antialiased`}>
         {children}
         <PwaRegister />
         <Toaster position="top-center" richColors />

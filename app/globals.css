@@ -15,15 +15,15 @@
   --secondary: #e8d5c4;
   --secondary-foreground: #3c2a21;
   --muted: #e8d5c4;
-  --muted-foreground: #7a8471;
+  --muted-foreground: #5c5348;
   --accent: #c99a3a;
   --accent-foreground: #3c2a21;
   --destructive: #b54a3a;
   --destructive-foreground: #faf6f0;
-  --border: #e8d5c4;
-  --input: #e8d5c4;
+  --border: #e0d2c2;
+  --input: #e0d2c2;
   --ring: #c47a4a;
-  --radius: 0.75rem;
+  --radius: 0.5rem;
   --marron: #3c2a21;
   --terracota: #c47a4a;
   --beige: #f3ede3;
@@ -64,8 +64,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-nunito);
-  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -80,5 +80,16 @@
   h3,
   h4 {
     @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .photo-hover {
+    @apply transition-transform duration-500 ease-out;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .group:hover .photo-hover {
+      transform: scale(1.03);
+    }
   }
 }

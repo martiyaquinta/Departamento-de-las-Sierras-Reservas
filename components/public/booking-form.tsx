@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createReservationAction } from "@/lib/actions/reservations";
 import { calculateTotal } from "@/lib/pricing";
 import { disabledDaysMatcher } from "@/lib/availability";
@@ -127,16 +126,14 @@ export function BookingForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6 pb-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif text-xl">Elegí tus noches</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Solo findes (y puentes que abramos). Check-in el viernes · check-out el
-            domingo. Las fechas tachadas no se pueden elegir.
-          </p>
-        </CardHeader>
-        <CardContent>
+    <form onSubmit={onSubmit} className="space-y-8 pb-8">
+      <section className="rounded-sm border border-marron/12 bg-crema p-5 sm:p-6">
+        <h2 className="font-serif text-xl font-semibold text-marron">Elegí tus noches</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Solo findes (y puentes que abramos). Check-in el viernes · check-out el domingo.
+          Las fechas tachadas no se pueden elegir.
+        </p>
+        <div className="mt-5">
           <Calendar
             mode="range"
             selected={range}
@@ -144,23 +141,21 @@ export function BookingForm({
             numberOfMonths={1}
             disabled={disabled}
             defaultMonth={new Date()}
-            className="mx-auto rounded-xl border border-border bg-crema"
+            className="mx-auto rounded-sm border border-marron/10 bg-background"
           />
           {checkIn && checkOut && (
-            <p className="mt-3 text-center text-sm text-marron">
+            <p className="mt-4 text-center text-sm font-medium text-marron">
               {format(range!.from!, "d MMM", { locale: es })} →{" "}
               {format(range!.to!, "d MMM yyyy", { locale: es })}
               {pricing ? ` · ${pricing.nights} noche${pricing.nights === 1 ? "" : "s"}` : ""}
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif text-xl">Tus datos</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <section className="rounded-sm border border-marron/12 bg-crema p-5 sm:p-6">
+        <h2 className="font-serif text-xl font-semibold text-marron">Tus datos</h2>
+        <div className="mt-5 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="guests">Huéspedes (máx. {capacity})</Label>
             <Input
@@ -170,6 +165,7 @@ export function BookingForm({
               max={capacity}
               value={guests}
               onChange={(e) => setGuests(Number(e.target.value))}
+              className="min-h-12 bg-background"
               required
             />
           </div>
@@ -180,6 +176,7 @@ export function BookingForm({
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
               placeholder="Tu nombre"
+              className="min-h-12 bg-background"
               required
             />
           </div>
@@ -191,6 +188,7 @@ export function BookingForm({
               value={guestPhone}
               onChange={(e) => setGuestPhone(e.target.value)}
               placeholder="+54 9 11 ..."
+              className="min-h-12 bg-background"
               required
             />
           </div>
@@ -202,6 +200,7 @@ export function BookingForm({
               value={guestEmail}
               onChange={(e) => setGuestEmail(e.target.value)}
               placeholder="tu@email.com"
+              className="min-h-12 bg-background"
             />
           </div>
           <div className="space-y-2">
@@ -211,29 +210,30 @@ export function BookingForm({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Horario de llegada, consultas..."
+              className="min-h-24 bg-background"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card className="border-primary/30 bg-crema">
-        <CardContent className="space-y-3 pt-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-primary">
-            Descuento por estadía prolongada
-          </p>
-          <div className="flex items-center justify-between text-sm">
+      <section className="rounded-sm border border-marron/15 bg-crema p-5 sm:p-6">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-terracota">
+          Descuento por estadía prolongada
+        </p>
+        <div className="mt-4 space-y-2.5 text-sm">
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">2 o más noches</span>
-            <span className="font-semibold text-primary">
+            <span className="font-semibold text-marron">
               {formatARS(pricePerNight)} / noche
             </span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">1 noche (sin descuento)</span>
             <span
               className={
                 oneNightArs > pricePerNight
                   ? "text-muted-foreground line-through decoration-marron/40"
-                  : undefined
+                  : "font-medium text-marron"
               }
             >
               {formatARS(oneNightArs)}
@@ -244,7 +244,7 @@ export function BookingForm({
           )}
           {pricing && pricing.nights > 0 && (
             <>
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between pt-2">
                 <span>
                   {pricing.nights} noche{pricing.nights === 1 ? "" : "s"}
                   {pricing.nights === 1
@@ -256,26 +256,31 @@ export function BookingForm({
                 </span>
               </div>
               {cleaningFee > 0 && (
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between">
                   <span>Limpieza</span>
                   <span>{formatARS(cleaningFee)}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between border-t border-border pt-3 text-base font-bold">
+              <div className="flex items-center justify-between border-t border-marron/10 pt-3 text-base font-bold">
                 <span>Total estimado</span>
-                <span className="text-primary">{formatARS(pricing.total)}</span>
+                <span className="text-marron">{formatARS(pricing.total)}</span>
               </div>
             </>
           )}
-          <p className="text-xs text-muted-foreground">
-            Es una solicitud. El dueño confirma y te escribe. No hay cobro online en esta
-            versión. Montos en pesos.
-          </p>
-          <Button type="submit" size="lg" className="w-full" disabled={pending}>
-            {pending ? "Enviando..." : "Reservar y abrir WhatsApp"}
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+          Es una solicitud. El dueño confirma y te escribe. No hay cobro online en esta
+          versión. Montos en pesos.
+        </p>
+        <Button
+          type="submit"
+          size="lg"
+          className="mt-5 min-h-12 w-full rounded-full bg-marron text-crema hover:bg-marron/90"
+          disabled={pending}
+        >
+          {pending ? "Enviando..." : "Reservar y abrir WhatsApp"}
+        </Button>
+      </section>
     </form>
   );
 }
