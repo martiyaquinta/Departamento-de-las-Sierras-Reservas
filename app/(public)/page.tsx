@@ -38,29 +38,30 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero — foto vertical (header.jpg 720×1280) */}
+      {/* Hero — header.jpg más luminosa; object-bottom recorta cielo / muestra Tandil */}
       <section className="relative isolate min-h-[min(92dvh,720px)] w-full overflow-hidden bg-ink sm:min-h-[85vh]">
         <Image
           src={hero}
           alt={property.name}
           fill
-          className="object-cover object-center"
+          className="object-cover object-bottom brightness-[1.18] contrast-[1.05] saturate-[1.08]"
           sizes="100vw"
           priority
         />
+        {/* Velo mínimo solo bajo el bloque de texto */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/15"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-black/40 via-black/10 to-transparent"
           aria-hidden
         />
 
         <div className="relative z-10 mx-auto flex min-h-[min(92dvh,720px)] max-w-5xl flex-col justify-end px-4 pb-10 pt-20 sm:min-h-[85vh] sm:px-6 sm:pb-16">
-          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-white/85 sm:mb-3 sm:text-xs sm:tracking-[0.18em]">
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-white drop-shadow-sm sm:mb-3 sm:text-xs sm:tracking-[0.18em]">
             Tandil · centro
           </p>
-          <h1 className="max-w-2xl font-display text-[1.85rem] font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl">
+          <h1 className="max-w-2xl font-display text-[1.85rem] font-semibold leading-[1.1] tracking-tight text-white drop-shadow-md sm:text-5xl md:text-6xl">
             {property.name}
           </h1>
-          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-white/90 sm:mt-4 sm:text-lg">
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-white/95 drop-shadow-sm sm:mt-4 sm:text-lg">
             {property.tagline ??
               "Tu escapada de fin de semana a las sierras — vista desde el balcón, a pasos del centro."}
           </p>
@@ -73,7 +74,7 @@ export default async function HomePage() {
             </Link>
             <a
               href="#fotos"
-              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10 sm:w-auto"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/50 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-[2px] transition hover:border-white hover:bg-white/20 sm:w-auto"
             >
               Ver fotos
             </a>
