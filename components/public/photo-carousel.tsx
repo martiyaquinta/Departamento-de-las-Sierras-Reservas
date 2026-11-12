@@ -6,7 +6,7 @@ import type { GalleryItem } from "@/lib/local-media";
 
 type Photo = Extract<GalleryItem, { kind: "photo" }>;
 
-/** Galería “El lugar”: cilindro 3D (sin huecos blancos entre fotos). */
+/** Galería “El lugar”: cilindro 3D arrastrable. */
 export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
   const photos = items.filter((i): i is Photo => i.kind === "photo");
 
@@ -14,7 +14,7 @@ export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
     return (
       <div className="relative mx-auto h-[min(70vh,560px)] w-full max-w-md overflow-hidden bg-transparent">
         <Image
-          src="/photos/tandil.png"
+          src="/photos/depto-hero.jpg"
           alt="Departamento de las Sierras"
           fill
           className="object-contain"
@@ -36,27 +36,27 @@ export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
         items={carouselItems}
         preset="cylinder"
         intro="rise"
-        cardWidth={220}
+        cardWidth={240}
         aspectRatio={0.72}
-        speed={14}
+        speed={12}
         captions={false}
-        gap={18}
+        gap={16}
         tilt={-5}
         curve={1}
         perspective={2500}
         autoplay="drift"
         interval={3}
         direction="left"
-        momentum={0.6}
+        momentum={0.65}
         snap
         pauseOnHover
         focusOnClick
         draggable
         parallax={0.3}
-        stretch={0.5}
+        stretch={0.7}
         fadeColor="#ffffff"
-        depthFade={0.55}
-        innerShade={0.45}
+        depthFade={0.45}
+        innerShade={0.4}
         cornerRadius={12}
       />
     </div>
