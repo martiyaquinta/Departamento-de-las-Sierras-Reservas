@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Las Sierras",
   },
   description:
-    "Finde en Tandil con vista a las sierras, en San Martín e Yrigoyen. 2 a 3 personas. Reservá online.",
+    "Finde en Tandil cerca de todo: San Martín 454, centro caminable. Cafés y bares a media cuadra. 2 a 3 personas. Reservá online.",
   applicationName: "Departamento de las Sierras",
   appleWebApp: {
     capable: true,

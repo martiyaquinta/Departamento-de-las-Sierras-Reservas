@@ -12,8 +12,9 @@ export const DEMO_PROPERTY: Property = {
   tagline: "Una estadía cálida en el centro de Tandil, cerquita de todo.",
   description:
     "Hola! Departamento de las Sierras te ofrece una cálida estadía en Tandil con la mejor ubicación, cerquita de todo!! Centro, dique, parque y calvario.\n\nEstá equipado para 2 a 3 personas.",
-  address_text: "San Martín e Yrigoyen, Tandil",
-  maps_url: "https://maps.google.com/?q=San+Martin+e+Yrigoyen,+Tandil",
+  address_text: "San Martín 454, Tandil",
+  maps_url:
+    "https://www.google.com/maps/search/?api=1&query=San+Mart%C3%ADn+454,+B7000+Tandil,+Provincia+de+Buenos+Aires",
   whatsapp_e164: "5492266515776",
   capacity: 3,
   // ARS publicados: 1 noche = USD 80 · 2+ = USD 60/noche (blue 1560)

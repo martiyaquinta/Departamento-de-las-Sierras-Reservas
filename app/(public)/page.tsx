@@ -10,6 +10,13 @@ import {
   LOCAL_PHOTOS,
   LOCAL_VIDEOS,
 } from "@/lib/local-media";
+import {
+  NEARBY_BLOCK_POIS,
+  NEARBY_MAP_PATH,
+  NEARBY_WALKS,
+  PROPERTY_ADDRESS_SHORT,
+  PROPERTY_MAPS_URL,
+} from "@/lib/nearby-pois";
 import { formatARS } from "@/lib/utils";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 
@@ -28,7 +35,6 @@ export default async function HomePage() {
   const savePct = showPromo ? Math.round(((oneNight - multi) / oneNight) * 100) : 0;
 
   const storyA = LOCAL_PHOTOS.find((p) => p.id === "local-03")?.storage_path ?? LOCAL_HERO_PATH;
-  const storyB = LOCAL_PHOTOS.find((p) => p.id === "local-06")?.storage_path ?? "/photos/depto-06.jpg";
 
   return (
     <>
@@ -84,8 +90,8 @@ export default async function HomePage() {
                 Un depto para el finde, en el centro
               </h2>
               <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:text-base">
-                Vista a las sierras desde el balcón · San Martín e Yrigoyen · se camina a
-                dique, parque y calvario.
+                Vista a las sierras desde el balcón · San Martín 454 ·{" "}
+                <span className="font-medium text-ink">cerca de todo</span>, se camina.
               </p>
             </div>
             <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -168,37 +174,89 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-6 sm:mt-10 sm:gap-10 lg:grid-cols-12 lg:gap-12">
-            <div className="order-2 lg:order-1 lg:col-span-7">
-              <div className="relative mx-auto aspect-[3/4] max-h-[min(70vw,420px)] w-full max-w-sm overflow-hidden bg-transparent sm:max-h-[560px] lg:mx-0 lg:max-w-none">
-                <Image
-                  src={storyB}
-                  alt="Ambiente del departamento"
-                  fill
-                  className="object-cover sm:object-contain"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
-              </div>
-            </div>
-            <div className="order-1 flex flex-col justify-center lg:order-2 lg:col-span-5">
-              <h3 className="font-display text-lg font-semibold text-ink sm:text-2xl">
-                Centro caminable
-              </h3>
-              <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:text-base">
-                {property.address_text ?? "San Martín e Yrigoyen, Tandil"}. Desde acá llegás
-                a pie al dique, al parque Independencia y al Calvario. El finde se arma sin
-                auto si querés.
+          <div className="mt-8 grid gap-5 sm:mt-10 sm:gap-8 lg:grid-cols-12 lg:items-start lg:gap-8">
+            <div className="lg:col-span-7">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-terracota sm:text-xs">
+                Ubicación
               </p>
-              {property.maps_url && (
-                <a
-                  href={property.maps_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-terracota underline-offset-4 hover:underline sm:mt-5"
-                >
-                  Abrir en Google Maps
-                </a>
-              )}
+              <h3 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                Estamos cerca de todo
+              </h3>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-foreground/90 sm:mt-3.5 sm:text-base">
+                En el centro de Tandil, en{" "}
+                <span className="font-medium text-ink">
+                  {property.address_text ?? PROPERTY_ADDRESS_SHORT}
+                </span>
+                . Cafés, bares y kiosko 24hs a pasos: se camina, no hace falta auto para el
+                finde.
+              </p>
+
+              <ul className="mt-5 border-t border-line sm:mt-6">
+                {NEARBY_BLOCK_POIS.map((poi) => (
+                  <li
+                    key={poi.name}
+                    className="flex items-baseline justify-between gap-3 border-b border-line py-2.5 text-[15px] sm:py-3 sm:text-base"
+                  >
+                    <span className="font-medium text-ink">
+                      {poi.name}
+                      {poi.blurb ? (
+                        <span className="ml-1.5 font-normal text-muted-foreground">
+                          · {poi.blurb}
+                        </span>
+                      ) : null}
+                    </span>
+                    <span className="shrink-0 text-sm text-muted-foreground sm:text-[15px]">
+                      {poi.walking}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground sm:mt-6 sm:text-xs">
+                Paseos a pie
+              </p>
+              <ul className="mt-1.5 border-t border-line">
+                {NEARBY_WALKS.map((poi) => (
+                  <li
+                    key={poi.name}
+                    className="flex items-baseline justify-between gap-3 border-b border-line py-2 text-sm sm:py-2.5 sm:text-[15px]"
+                  >
+                    <span className="text-ink">{poi.name}</span>
+                    <span className="shrink-0 text-muted-foreground">{poi.walking}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href={property.maps_url || PROPERTY_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex min-h-11 w-fit items-center text-sm font-semibold text-terracota underline-offset-4 hover:underline sm:mt-5"
+              >
+                Abrir en Google Maps
+              </a>
+            </div>
+
+            <div className="lg:col-span-5">
+              <a
+                href={property.maps_url || PROPERTY_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden border border-line transition hover:border-ink/25"
+              >
+                <div className="relative mx-auto aspect-square w-full max-w-[220px] sm:max-w-[260px] lg:ml-auto lg:max-w-[280px]">
+                  <Image
+                    src={NEARBY_MAP_PATH}
+                    alt="Mapa chico del barrio: depto en San Martín 454 y lugares a media cuadra"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 1024px) 260px, 280px"
+                  />
+                </div>
+                <p className="border-t border-line px-2.5 py-2 text-center text-[11px] text-muted-foreground sm:text-xs">
+                  Barrio · tocá para abrir Maps
+                </p>
+              </a>
             </div>
           </div>
         </section>
@@ -317,7 +375,9 @@ export default async function HomePage() {
 
         <footer className="border-t border-line pt-6 text-sm text-muted-foreground sm:pt-8">
           <p className="font-display text-base font-semibold text-ink">De Las Sierras</p>
-          <p className="mt-1.5 sm:mt-2">{property.address_text ?? "San Martín e Yrigoyen, Tandil"}</p>
+          <p className="mt-1.5 sm:mt-2">
+            {property.address_text ?? PROPERTY_ADDRESS_SHORT}
+          </p>
           {wa && (
             <a
               href={wa}
