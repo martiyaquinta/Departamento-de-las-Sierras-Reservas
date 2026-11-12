@@ -1,24 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Gallery } from "@/components/public/gallery";
+import { VideoGallery } from "@/components/public/video-gallery";
 import { StickyCta } from "@/components/public/sticky-cta";
-import { getPhotos, getProperty } from "@/lib/data";
+import { getProperty } from "@/lib/data";
+import {
+  getPublicPhotoItems,
+  LOCAL_HERO_PATH,
+  LOCAL_PHOTOS,
+  LOCAL_VIDEOS,
+} from "@/lib/local-media";
 import { formatARS } from "@/lib/utils";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
-import { photoPublicUrl } from "@/lib/data-client";
-
-function coverSrc(path: string | null | undefined): string | null {
-  if (!path) return null;
-  if (path.startsWith("http") || path.startsWith("/")) return path;
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base) return path;
-  return `${base}/storage/v1/object/public/property-photos/${path}`;
-}
 
 export default async function HomePage() {
-  const [property, photos] = await Promise.all([getProperty(), getPhotos()]);
+  const property = await getProperty();
   const wa = buildGenericWhatsAppUrl(property.whatsapp_e164);
-  const hero = coverSrc(property.cover_photo_path) ?? "/photos/depto-hero.jpg";
+  const hero = LOCAL_HERO_PATH;
+  const photoItems = getPublicPhotoItems();
 
   const oneNight =
     property.price_one_night != null && property.price_one_night > 0
@@ -28,51 +27,46 @@ export default async function HomePage() {
   const showPromo = oneNight > multi;
   const savePct = showPromo ? Math.round(((oneNight - multi) / oneNight) * 100) : 0;
 
-  const storyPhotos = photos.slice(0, 2);
-  const storyA = storyPhotos[0]
-    ? photoPublicUrl(storyPhotos[0].storage_path)
-    : "/photos/depto-01.jpg";
-  const storyB = storyPhotos[1]
-    ? photoPublicUrl(storyPhotos[1].storage_path)
-    : "/photos/depto-02.jpg";
+  const storyA = LOCAL_PHOTOS.find((p) => p.id === "local-03")?.storage_path ?? LOCAL_HERO_PATH;
+  const storyB = LOCAL_PHOTOS.find((p) => p.id === "local-06")?.storage_path ?? "/photos/depto-06.jpg";
 
   return (
     <>
-      {/* 1. Hero full-bleed */}
       <section className="relative isolate min-h-[72vh] w-full sm:min-h-[78vh]">
         <Image
           src={hero}
           alt={property.name}
           fill
-          className="object-cover object-[center_22%]"
+          className="object-cover object-center"
           sizes="100vw"
           priority
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-marron/75 via-marron/25 to-marron/10"
+          className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/5"
           aria-hidden
         />
+
         <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-end px-4 pb-12 pt-24 sm:min-h-[78vh] sm:px-6 sm:pb-16">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-crema/85">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-white/85">
             Tandil · centro
           </p>
-          <h1 className="max-w-2xl font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-crema sm:text-5xl md:text-6xl">
+          <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
             {property.name}
           </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-crema/90 sm:text-lg">
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-white/90 sm:text-lg">
             {property.tagline ??
               "Tu escapada de fin de semana a las sierras — vista desde el balcón, a pasos del centro."}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/reservar"
-              className="inline-flex min-h-12 items-center rounded-full bg-crema px-6 py-3 text-sm font-semibold text-marron shadow-sm transition hover:bg-white"
+              className="inline-flex min-h-12 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-white/95"
             >
               Reservar finde
             </Link>
             <a
               href="#fotos"
-              className="inline-flex min-h-12 items-center rounded-full border border-crema/40 px-6 py-3 text-sm font-semibold text-crema transition hover:border-crema hover:bg-crema/10"
+              className="inline-flex min-h-12 items-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
             >
               Ver fotos
             </a>
@@ -81,11 +75,10 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-5xl px-4 pb-28 pt-10 sm:px-6 sm:pt-14">
-        {/* 2. Identidad + chips */}
-        <section className="mb-14 border-b border-marron/10 pb-10">
+        <section className="mb-14 border-b border-line pb-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">
-              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Un depto para el finde, en el centro
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
@@ -102,7 +95,7 @@ export default async function HomePage() {
               ].map((chip) => (
                 <li
                   key={chip}
-                  className="rounded-full border border-marron/15 bg-crema px-3.5 py-1.5 text-sm text-marron"
+                  className="rounded-full border border-line bg-transparent px-3.5 py-1.5 text-sm text-ink"
                 >
                   {chip}
                 </li>
@@ -111,22 +104,32 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* 3. Galería photography-first */}
         <section id="fotos" className="mb-16 scroll-mt-20">
           <div className="mb-5 flex items-baseline justify-between gap-4">
-            <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
               El lugar
             </h2>
-            <p className="text-sm text-muted-foreground">Fotos reales del depto</p>
+            <p className="text-sm text-muted-foreground">{LOCAL_PHOTOS.length} fotos</p>
           </div>
-          <Gallery photos={photos} />
+          <Gallery items={photoItems} />
         </section>
 
-        {/* 4. Historia + fotos full-width intercaladas */}
+        {LOCAL_VIDEOS.length > 0 && (
+          <section id="videos" className="mb-16 scroll-mt-20">
+            <div className="mb-5 flex items-baseline justify-between gap-4">
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                Videos
+              </h2>
+              <p className="text-sm text-muted-foreground">{LOCAL_VIDEOS.length} clips</p>
+            </div>
+            <VideoGallery videos={LOCAL_VIDEOS} />
+          </section>
+        )}
+
         <section className="mb-16">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-5">
-              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Cómo es quedarse acá
               </h2>
               {property.description ? (
@@ -145,12 +148,12 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="space-y-4 lg:col-span-7">
-              <div className="group relative aspect-[4/3] overflow-hidden rounded-sm bg-arena">
+              <div className="relative aspect-[16/10] overflow-hidden bg-transparent">
                 <Image
                   src={storyA}
                   alt="Interior del departamento"
                   fill
-                  className="object-cover photo-hover"
+                  className="object-contain sm:object-cover"
                   sizes="(max-width: 1024px) 100vw, 55vw"
                 />
               </div>
@@ -159,18 +162,18 @@ export default async function HomePage() {
 
           <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="order-2 lg:order-1 lg:col-span-7">
-              <div className="group relative aspect-[16/10] overflow-hidden rounded-sm bg-arena">
+              <div className="relative mx-auto aspect-[3/4] max-h-[560px] w-full max-w-md overflow-hidden bg-transparent lg:mx-0 lg:max-w-none">
                 <Image
                   src={storyB}
                   alt="Ambiente del departamento"
                   fill
-                  className="object-cover photo-hover"
-                  sizes="(max-width: 1024px) 100vw, 55vw"
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
                 />
               </div>
             </div>
             <div className="order-1 flex flex-col justify-center lg:order-2 lg:col-span-5">
-              <h3 className="font-serif text-xl font-semibold text-marron sm:text-2xl">
+              <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
                 Centro caminable
               </h3>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
@@ -192,17 +195,16 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* 5. Amenities tipográficos */}
         {property.amenities.length > 0 && (
-          <section className="mb-16 border-y border-marron/10 py-12">
-            <h2 className="mb-6 font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+          <section className="mb-16 border-y border-line py-12">
+            <h2 className="mb-6 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
               Qué hay en el depto
             </h2>
             <ul className="columns-1 gap-x-12 sm:columns-2">
               {property.amenities.map((a) => (
                 <li
                   key={a}
-                  className="mb-2.5 break-inside-avoid border-b border-marron/8 py-2 text-[15px] leading-snug text-foreground/90"
+                  className="mb-2.5 break-inside-avoid border-b border-line py-2 text-[15px] leading-snug text-foreground/90"
                 >
                   {a}
                 </li>
@@ -212,14 +214,13 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* 6. Precio editorial promo */}
         <section className="mb-16">
-          <div className="rounded-sm border border-marron/12 bg-crema px-5 py-8 sm:px-10 sm:py-10">
+          <div className="border border-line bg-transparent px-5 py-8 sm:px-10 sm:py-10">
             <div className="flex flex-wrap items-center gap-3">
-              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Precio
               </h2>
-              <span className="rounded-full bg-terracota px-3 py-1 text-xs font-semibold uppercase tracking-wide text-crema">
+              <span className="rounded-full bg-terracota px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
                 Descuento por estadía prolongada
               </span>
             </div>
@@ -229,14 +230,14 @@ export default async function HomePage() {
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-terracota">
                   Con 2 o más noches
                 </p>
-                <p className="mt-2 font-serif text-4xl font-semibold tracking-tight text-marron sm:text-5xl">
+                <p className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
                   {formatARS(multi)}
                   <span className="ml-2 font-sans text-base font-normal text-muted-foreground">
                     / noche
                   </span>
                 </p>
                 {showPromo && (
-                  <p className="mt-2 text-sm font-medium text-marron/80">
+                  <p className="mt-2 text-sm font-medium text-ink/80">
                     {savePct > 0
                       ? `${savePct}% menos que la tarifa de 1 noche`
                       : "Mejor precio por noche"}
@@ -247,8 +248,8 @@ export default async function HomePage() {
                   <span
                     className={
                       showPromo
-                        ? "line-through decoration-marron/40"
-                        : "font-semibold text-marron"
+                        ? "line-through decoration-ink/40"
+                        : "font-semibold text-ink"
                     }
                   >
                     {formatARS(oneNight)}
@@ -268,7 +269,7 @@ export default async function HomePage() {
 
               <Link
                 href="/reservar"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-marron px-8 py-3.5 text-sm font-semibold text-crema transition hover:bg-marron/90 sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-ink/90 sm:w-auto"
               >
                 Ver disponibilidad
               </Link>
@@ -276,10 +277,9 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Rules */}
         {property.house_rules && (
           <section className="mb-16">
-            <h2 className="mb-3 font-serif text-xl font-semibold text-marron sm:text-2xl">
+            <h2 className="mb-3 font-display text-xl font-semibold text-ink sm:text-2xl">
               Para que estemos bien
             </h2>
             <p className="max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -288,11 +288,10 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* CTAs finales */}
         <section className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href="/reservar"
-            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-marron px-6 py-3.5 text-sm font-semibold text-crema transition hover:bg-marron/90"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-ink/90"
           >
             Reservar finde
           </Link>
@@ -301,16 +300,15 @@ export default async function HomePage() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-marron/20 bg-crema px-6 py-3.5 text-sm font-semibold text-marron transition hover:border-marron/40"
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-line bg-transparent px-6 py-3.5 text-sm font-semibold text-ink transition hover:border-ink/40"
             >
               Consultar por WhatsApp
             </a>
           )}
         </section>
 
-        {/* 8. Footer mínimo */}
-        <footer className="border-t border-marron/10 pt-8 text-sm text-muted-foreground">
-          <p className="font-serif text-base font-semibold text-marron">De Las Sierras</p>
+        <footer className="border-t border-line pt-8 text-sm text-muted-foreground">
+          <p className="font-display text-base font-semibold text-ink">De Las Sierras</p>
           <p className="mt-2">{property.address_text ?? "San Martín e Yrigoyen, Tandil"}</p>
           {wa && (
             <a
