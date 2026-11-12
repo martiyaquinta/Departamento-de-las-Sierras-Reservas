@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { getProperty } from "@/lib/data";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatARS } from "@/lib/utils";
@@ -40,7 +37,7 @@ export default async function GraciasPage({ searchParams }: Props) {
       : null;
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-12 text-center">
+    <div className="mx-auto flex max-w-lg flex-col px-4 py-14 sm:px-6">
       {wa && autoWa && (
         <script
           dangerouslySetInnerHTML={{
@@ -49,45 +46,56 @@ export default async function GraciasPage({ searchParams }: Props) {
         />
       )}
 
-      <CheckCircle2 className="mb-4 h-14 w-14 text-primary" />
-      <h1 className="font-serif text-2xl font-semibold">¡Listo, {name.split(" ")[0]}!</h1>
-      <p className="mt-2 text-muted-foreground">
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-terracota">
+        Solicitud recibida
+      </p>
+      <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-marron">
+        Listo, {name.split(" ")[0]}
+      </h1>
+      <p className="mt-3 text-base leading-relaxed text-muted-foreground">
         Recibimos tu solicitud. Te redirigimos a WhatsApp con los datos de la reserva para
         confirmar.
       </p>
 
       {code && (
-        <Card className="mt-6 w-full bg-crema">
-          <CardContent className="space-y-2 p-5">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Código de seguimiento
+        <div className="mt-8 rounded-sm border border-marron/12 bg-crema p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+            Código de seguimiento
+          </p>
+          <p className="mt-1 font-mono text-2xl font-bold text-marron">{code}</p>
+          {total > 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Total estimado: {formatARS(total)}
             </p>
-            <p className="font-mono text-2xl font-bold text-marron">{code}</p>
-            {total > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Total estimado: {formatARS(total)}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          )}
+        </div>
       )}
 
-      <div className="mt-6 flex w-full flex-col gap-3">
+      <div className="mt-8 flex w-full flex-col gap-3">
         {wa && (
-          <Button asChild variant="whatsapp" size="lg">
-            <a href={wa} target="_blank" rel="noopener noreferrer">
-              Abrir WhatsApp con la reserva
-            </a>
-          </Button>
+          <a
+            href={wa}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-white"
+          >
+            Abrir WhatsApp con la reserva
+          </a>
         )}
         {code && (
-          <Button asChild variant="outline" size="lg">
-            <Link href={`/reserva/${code}`}>Ver estado de la reserva</Link>
-          </Button>
+          <Link
+            href={`/reserva/${code}`}
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-marron/20 bg-crema px-6 py-3.5 text-sm font-semibold text-marron"
+          >
+            Ver estado de la reserva
+          </Link>
         )}
-        <Button asChild variant="ghost">
-          <Link href="/">Volver al inicio</Link>
-        </Button>
+        <Link
+          href="/"
+          className="inline-flex min-h-11 items-center justify-center text-sm font-medium text-terracota hover:underline"
+        >
+          Volver al inicio
+        </Link>
       </div>
     </div>
   );

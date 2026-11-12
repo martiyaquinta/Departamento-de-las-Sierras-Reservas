@@ -14,10 +14,10 @@ export function StickyCta({
     priceOneNight != null && priceOneNight > 0 && priceOneNight > priceFrom;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-crema/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-marron/10 bg-crema/98 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(60,42,33,0.08)] md:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-primary">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-terracota">
             Descuento estadía
           </p>
           <p className="truncate font-semibold text-marron">
@@ -38,7 +38,7 @@ export function StickyCta({
         </div>
         <Link
           href="/reservar"
-          className="shrink-0 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-md"
+          className="inline-flex min-h-12 shrink-0 items-center rounded-full bg-marron px-5 py-3 text-sm font-semibold text-crema shadow-sm"
         >
           Reservar finde
         </Link>

@@ -1,49 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  MapPin,
-  Users,
-  Mountain,
-  CalendarDays,
-  Wifi,
-  ChefHat,
-  BedDouble,
-  ExternalLink,
-  Armchair,
-  Tv,
-  Bath,
-  Microwave,
-  Refrigerator,
-  Flame,
-  Shirt,
-  PawPrint,
-} from "lucide-react";
 import { Gallery } from "@/components/public/gallery";
 import { StickyCta } from "@/components/public/sticky-cta";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { getPhotos, getProperty } from "@/lib/data";
 import { formatARS } from "@/lib/utils";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
-
-const amenityIcon = (name: string) => {
-  const n = name.toLowerCase();
-  if (n.includes("wifi") || n.includes("internet")) return Wifi;
-  if (n.includes("cocina")) return ChefHat;
-  if (n.includes("cama") && !n.includes("sofá") && !n.includes("sofa")) return BedDouble;
-  if (n.includes("sofá") || n.includes("sofa") || n.includes("sillón") || n.includes("sillon"))
-    return Armchair;
-  if (n.includes("tv") || n.includes("tele")) return Tv;
-  if (n.includes("baño") || n.includes("ducha")) return Bath;
-  if (n.includes("microondas")) return Microwave;
-  if (n.includes("heladera")) return Refrigerator;
-  if (n.includes("calef")) return Flame;
-  if (n.includes("placard") || n.includes("vajilla")) return Shirt;
-  if (n.includes("sierra") || n.includes("balcón") || n.includes("balcon")) return Mountain;
-  return null;
-};
+import { photoPublicUrl } from "@/lib/data-client";
 
 function coverSrc(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -58,236 +20,309 @@ export default async function HomePage() {
   const wa = buildGenericWhatsAppUrl(property.whatsapp_e164);
   const hero = coverSrc(property.cover_photo_path) ?? "/photos/depto-hero.jpg";
 
+  const oneNight =
+    property.price_one_night != null && property.price_one_night > 0
+      ? property.price_one_night
+      : property.price_per_night;
+  const multi = property.price_per_night;
+  const showPromo = oneNight > multi;
+  const savePct = showPromo ? Math.round(((oneNight - multi) / oneNight) * 100) : 0;
+
+  const storyPhotos = photos.slice(0, 2);
+  const storyA = storyPhotos[0]
+    ? photoPublicUrl(storyPhotos[0].storage_path)
+    : "/photos/depto-01.jpg";
+  const storyB = storyPhotos[1]
+    ? photoPublicUrl(storyPhotos[1].storage_path)
+    : "/photos/depto-02.jpg";
+
   return (
     <>
-      <div className="mx-auto max-w-3xl px-4 pb-28 pt-4">
-        {/* Hero photo sola arriba — ancla arriba para no cortar el logo */}
-        <section className="mb-5 overflow-hidden rounded-2xl">
-          <div className="relative aspect-[5/4] w-full sm:aspect-[16/11]">
-            <Image
-              src={hero}
-              alt={property.name}
-              fill
-              className="object-cover object-[center_18%]"
-              sizes="(max-width: 768px) 100vw, 720px"
-              priority
-            />
-          </div>
-        </section>
-
-        {/* Título */}
-        <section className="mb-6 text-center text-marron">
-          <div className="mb-2 flex items-center justify-center gap-2">
-            <Badge variant="secondary" className="bg-arena text-marron">
-              Tandil · centro
-            </Badge>
-          </div>
-          <h1 className="font-serif text-2xl font-semibold leading-tight sm:text-3xl">
+      {/* 1. Hero full-bleed */}
+      <section className="relative isolate min-h-[72vh] w-full sm:min-h-[78vh]">
+        <Image
+          src={hero}
+          alt={property.name}
+          fill
+          className="object-cover object-[center_22%]"
+          sizes="100vw"
+          priority
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-marron/75 via-marron/25 to-marron/10"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-end px-4 pb-12 pt-24 sm:min-h-[78vh] sm:px-6 sm:pb-16">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-crema/85">
+            Tandil · centro
+          </p>
+          <h1 className="max-w-2xl font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-crema sm:text-5xl md:text-6xl">
             {property.name}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-            {property.tagline ?? "Escapada de finde con vista a las sierras."}
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-crema/90 sm:text-lg">
+            {property.tagline ??
+              "Tu escapada de fin de semana a las sierras — vista desde el balcón, a pasos del centro."}
           </p>
-        </section>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/reservar"
+              className="inline-flex min-h-12 items-center rounded-full bg-crema px-6 py-3 text-sm font-semibold text-marron shadow-sm transition hover:bg-white"
+            >
+              Reservar finde
+            </Link>
+            <a
+              href="#fotos"
+              className="inline-flex min-h-12 items-center rounded-full border border-crema/40 px-6 py-3 text-sm font-semibold text-crema transition hover:border-crema hover:bg-crema/10"
+            >
+              Ver fotos
+            </a>
+          </div>
+        </div>
+      </section>
 
-        {/* Highlights */}
-        <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { icon: CalendarDays, label: "Finde", sub: "Entra vie · sale dom" },
-            { icon: Users, label: "2 a 3", sub: "personas" },
-            { icon: MapPin, label: "Cerquita de todo", sub: "Centro, dique y calvario" },
-            { icon: Mountain, label: "Tandil", sub: "sierras cerca" },
-          ].map((h) => (
-            <Card key={h.label} className="bg-crema">
-              <CardContent className="flex flex-col items-start gap-1 p-3">
-                <h.icon className="h-5 w-5 text-primary" />
-                <p className="text-sm font-semibold text-marron">{h.label}</p>
-                <p className="text-xs text-muted-foreground">{h.sub}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-        {/* Bienvenida humana */}
-        {property.description && (
-          <section className="mb-8">
-            <h2 className="mb-3 font-serif text-xl font-semibold">Sobre el depto</h2>
-            <Card className="border-primary/15 bg-crema/60">
-              <CardContent className="space-y-3 p-5">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90 sm:text-base">
-                  {property.description}
-                </p>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <PawPrint className="h-4 w-4 shrink-0 text-primary" />
-                  No se aceptan mascotas.
-                </p>
-              </CardContent>
-            </Card>
-          </section>
-        )}
-
-        {/* Amenities */}
-        {property.amenities.length > 0 && (
-          <section className="mb-8">
-            <h2 className="mb-3 font-serif text-xl font-semibold">Qué vas a encontrar</h2>
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {property.amenities.map((a) => {
-                const Icon = amenityIcon(a);
-                return (
-                  <li
-                    key={a}
-                    className="flex items-center gap-2 rounded-lg bg-crema px-3 py-2 text-sm"
-                  >
-                    {Icon ? (
-                      <Icon className="h-4 w-4 shrink-0 text-primary" />
-                    ) : (
-                      <span className="text-primary">•</span>
-                    )}
-                    {a}
-                  </li>
-                );
-              })}
+      <div className="mx-auto max-w-5xl px-4 pb-28 pt-10 sm:px-6 sm:pt-14">
+        {/* 2. Identidad + chips */}
+        <section className="mb-14 border-b border-marron/10 pb-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-xl">
+              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+                Un depto para el finde, en el centro
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                Vista a las sierras desde el balcón · San Martín e Yrigoyen · se camina a
+                dique, parque y calvario.
+              </p>
+            </div>
+            <ul className="flex flex-wrap gap-2">
+              {[
+                "2 a 3 personas",
+                "Solo findes · vie → dom",
+                "Centro Tandil",
+                "Sin mascotas",
+              ].map((chip) => (
+                <li
+                  key={chip}
+                  className="rounded-full border border-marron/15 bg-crema px-3.5 py-1.5 text-sm text-marron"
+                >
+                  {chip}
+                </li>
+              ))}
             </ul>
-          </section>
-        )}
+          </div>
+        </section>
 
-        {/* Gallery más abajo */}
-        <section className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-semibold">Más fotos</h2>
+        {/* 3. Galería photography-first */}
+        <section id="fotos" className="mb-16 scroll-mt-20">
+          <div className="mb-5 flex items-baseline justify-between gap-4">
+            <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+              El lugar
+            </h2>
+            <p className="text-sm text-muted-foreground">Fotos reales del depto</p>
+          </div>
           <Gallery photos={photos} />
         </section>
 
-        {/* Price — promo “estadía prolongada” */}
-        <section className="mb-8">
-          <Card className="border-primary/30 bg-gradient-to-br from-crema to-arena shadow-sm">
-            <CardContent className="space-y-4 p-5">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-serif text-xl font-semibold">Precio</h2>
-                <Badge className="bg-primary text-primary-foreground">
-                  Descuento por estadía prolongada
-                </Badge>
-              </div>
-
-              {(() => {
-                const oneNight =
-                  property.price_one_night != null && property.price_one_night > 0
-                    ? property.price_one_night
-                    : property.price_per_night;
-                const multi = property.price_per_night;
-                const showPromo = oneNight > multi;
-                const savePct = showPromo
-                  ? Math.round(((oneNight - multi) / oneNight) * 100)
-                  : 0;
-
-                return (
-                  <div className="space-y-3">
-                    <div className="rounded-xl border border-primary/20 bg-background/70 p-4">
-                      <p className="text-xs font-medium uppercase tracking-wide text-primary">
-                        Con 2 o más noches
-                      </p>
-                      <p className="mt-1 text-3xl font-bold text-primary sm:text-4xl">
-                        {formatARS(multi)}
-                        <span className="text-base font-normal text-muted-foreground">
-                          {" "}
-                          / noche
-                        </span>
-                      </p>
-                      {showPromo && (
-                        <p className="mt-1 text-sm font-medium text-marron">
-                          {savePct > 0
-                            ? `${savePct}% menos que la tarifa de 1 noche`
-                            : "Mejor precio por noche"}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="px-1">
-                      <p className="text-sm text-muted-foreground">
-                        Tarifa 1 noche:{" "}
-                        <span
-                          className={
-                            showPromo
-                              ? "font-medium text-muted-foreground line-through decoration-marron/50"
-                              : "font-semibold text-marron"
-                          }
-                        >
-                          {formatARS(oneNight)}
-                        </span>
-                        {showPromo && (
-                          <span className="ml-1 text-xs">(sin descuento)</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {property.cleaning_fee > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  + limpieza {formatARS(property.cleaning_fee)}
+        {/* 4. Historia + fotos full-width intercaladas */}
+        <section className="mb-16">
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="lg:col-span-5">
+              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+                Cómo es quedarse acá
+              </h2>
+              {property.description ? (
+                <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-foreground/90">
+                  {property.description}
+                </p>
+              ) : (
+                <p className="mt-4 text-base leading-relaxed text-foreground/90">
+                  Depto equipado para 2 a 3 personas, en pleno centro de Tandil. Ideal para
+                  un finde: llegás viernes, te vas domingo.
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Montos en pesos. El finde típico (vie–dom) entra en el descuento por estadía
-                prolongada.
+              <p className="mt-4 text-sm text-muted-foreground">
+                Check-in {property.check_in_time ?? "15:00"} · Check-out{" "}
+                {property.check_out_time ?? "11:00"}
               </p>
-              <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link href="/reservar">Ver disponibilidad</Link>
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="space-y-4 lg:col-span-7">
+              <div className="group relative aspect-[4/3] overflow-hidden rounded-sm bg-arena">
+                <Image
+                  src={storyA}
+                  alt="Interior del departamento"
+                  fill
+                  className="object-cover photo-hover"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="order-2 lg:order-1 lg:col-span-7">
+              <div className="group relative aspect-[16/10] overflow-hidden rounded-sm bg-arena">
+                <Image
+                  src={storyB}
+                  alt="Ambiente del departamento"
+                  fill
+                  className="object-cover photo-hover"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
+            </div>
+            <div className="order-1 flex flex-col justify-center lg:order-2 lg:col-span-5">
+              <h3 className="font-serif text-xl font-semibold text-marron sm:text-2xl">
+                Centro caminable
+              </h3>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                {property.address_text ?? "San Martín e Yrigoyen, Tandil"}. Desde acá llegás
+                a pie al dique, al parque Independencia y al Calvario. El finde se arma sin
+                auto si querés.
+              </p>
+              {property.maps_url && (
+                <a
+                  href={property.maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-terracota underline-offset-4 hover:underline"
+                >
+                  Abrir en Google Maps
+                </a>
+              )}
+            </div>
+          </div>
         </section>
 
-        {/* Location */}
-        <section className="mb-8">
-          <h2 className="mb-2 font-serif text-xl font-semibold">Ubicación</h2>
-          <p className="flex items-start gap-2 text-sm">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            {property.address_text ?? "San Martín e Yrigoyen, Tandil"}
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Centro, dique, parque y calvario a mano. Ideal para moverte a pie.
-          </p>
-          {property.maps_url && (
-            <a
-              href={property.maps_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
-            >
-              Abrir en Google Maps <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          )}
+        {/* 5. Amenities tipográficos */}
+        {property.amenities.length > 0 && (
+          <section className="mb-16 border-y border-marron/10 py-12">
+            <h2 className="mb-6 font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+              Qué hay en el depto
+            </h2>
+            <ul className="columns-1 gap-x-12 sm:columns-2">
+              {property.amenities.map((a) => (
+                <li
+                  key={a}
+                  className="mb-2.5 break-inside-avoid border-b border-marron/8 py-2 text-[15px] leading-snug text-foreground/90"
+                >
+                  {a}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm text-muted-foreground">No se aceptan mascotas.</p>
+          </section>
+        )}
+
+        {/* 6. Precio editorial promo */}
+        <section className="mb-16">
+          <div className="rounded-sm border border-marron/12 bg-crema px-5 py-8 sm:px-10 sm:py-10">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-serif text-2xl font-semibold tracking-tight text-marron sm:text-3xl">
+                Precio
+              </h2>
+              <span className="rounded-full bg-terracota px-3 py-1 text-xs font-semibold uppercase tracking-wide text-crema">
+                Descuento por estadía prolongada
+              </span>
+            </div>
+
+            <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-terracota">
+                  Con 2 o más noches
+                </p>
+                <p className="mt-2 font-serif text-4xl font-semibold tracking-tight text-marron sm:text-5xl">
+                  {formatARS(multi)}
+                  <span className="ml-2 font-sans text-base font-normal text-muted-foreground">
+                    / noche
+                  </span>
+                </p>
+                {showPromo && (
+                  <p className="mt-2 text-sm font-medium text-marron/80">
+                    {savePct > 0
+                      ? `${savePct}% menos que la tarifa de 1 noche`
+                      : "Mejor precio por noche"}
+                  </p>
+                )}
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Tarifa 1 noche:{" "}
+                  <span
+                    className={
+                      showPromo
+                        ? "line-through decoration-marron/40"
+                        : "font-semibold text-marron"
+                    }
+                  >
+                    {formatARS(oneNight)}
+                  </span>
+                  {showPromo && <span className="ml-1 text-xs">(sin descuento)</span>}
+                </p>
+                {property.cleaning_fee > 0 && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    + limpieza {formatARS(property.cleaning_fee)}
+                  </p>
+                )}
+                <p className="mt-3 max-w-md text-xs leading-relaxed text-muted-foreground">
+                  Montos en pesos. El finde típico (vie–dom, 2 noches) entra en el descuento
+                  por estadía prolongada.
+                </p>
+              </div>
+
+              <Link
+                href="/reservar"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-marron px-8 py-3.5 text-sm font-semibold text-crema transition hover:bg-marron/90 sm:w-auto"
+              >
+                Ver disponibilidad
+              </Link>
+            </div>
+          </div>
         </section>
 
         {/* Rules */}
         {property.house_rules && (
-          <section className="mb-8">
-            <h2 className="mb-2 font-serif text-xl font-semibold">Para que estemos bien</h2>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+          <section className="mb-16">
+            <h2 className="mb-3 font-serif text-xl font-semibold text-marron sm:text-2xl">
+              Para que estemos bien
+            </h2>
+            <p className="max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
               {property.house_rules}
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Check-in {property.check_in_time ?? "15:00"} · Check-out{" "}
-              {property.check_out_time ?? "11:00"}
             </p>
           </section>
         )}
 
-        <Separator className="mb-6" />
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg" className="flex-1">
-            <Link href="/reservar">Reservar finde</Link>
-          </Button>
+        {/* CTAs finales */}
+        <section className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link
+            href="/reservar"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-marron px-6 py-3.5 text-sm font-semibold text-crema transition hover:bg-marron/90"
+          >
+            Reservar finde
+          </Link>
           {wa && (
-            <Button asChild variant="whatsapp" size="lg" className="flex-1">
-              <a href={wa} target="_blank" rel="noopener noreferrer">
-                Escribime por WhatsApp
-              </a>
-            </Button>
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-marron/20 bg-crema px-6 py-3.5 text-sm font-semibold text-marron transition hover:border-marron/40"
+            >
+              Consultar por WhatsApp
+            </a>
           )}
-        </div>
+        </section>
+
+        {/* 8. Footer mínimo */}
+        <footer className="border-t border-marron/10 pt-8 text-sm text-muted-foreground">
+          <p className="font-serif text-base font-semibold text-marron">De Las Sierras</p>
+          <p className="mt-2">{property.address_text ?? "San Martín e Yrigoyen, Tandil"}</p>
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block font-medium text-terracota hover:underline"
+            >
+              WhatsApp
+            </a>
+          )}
+        </footer>
       </div>
 
       <StickyCta

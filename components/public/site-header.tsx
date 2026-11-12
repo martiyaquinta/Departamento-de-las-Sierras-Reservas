@@ -3,26 +3,26 @@ import Link from "next/link";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+    <header className="sticky top-0 z-40 border-b border-marron/10 bg-crema/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex min-h-12 items-center gap-2.5">
           <Image
             src="/brand/logo-sinfondo.png"
-            alt="Departamento de las Sierras"
-            width={40}
-            height={40}
-            className="h-9 w-9 object-contain"
+            alt="De Las Sierras"
+            width={36}
+            height={36}
+            className="h-8 w-8 object-contain sm:h-9 sm:w-9"
             priority
           />
-          <span className="font-serif text-sm font-semibold leading-tight text-marron sm:text-base">
+          <span className="font-serif text-[15px] font-semibold tracking-tight text-marron sm:text-base">
             De Las Sierras
           </span>
         </Link>
         <Link
           href="/reservar"
-          className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm"
+          className="inline-flex min-h-11 items-center rounded-full bg-marron px-5 py-2.5 text-sm font-semibold text-crema transition-colors hover:bg-marron/90"
         >
-          Reservá
+          Reservar finde
         </Link>
       </div>
     </header>
