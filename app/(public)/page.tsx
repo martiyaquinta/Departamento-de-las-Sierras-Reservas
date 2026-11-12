@@ -76,16 +76,16 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-5xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-8 sm:px-6 sm:pb-28 sm:pt-14">
-        {/* Intro + chips */}
+        {/* Intro + foto destacada (header.jpg) debajo del copy */}
         <section className="mb-10 border-b border-line pb-8 sm:mb-14 sm:pb-10">
           <div className="flex flex-col gap-5 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">
               <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-3xl">
-                Un depto para el finde, en el centro
+                {property.name}
               </h2>
               <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:text-base">
-                Vista a las sierras desde el balcón · San Martín e Yrigoyen · se camina a
-                dique, parque y calvario.
+                {property.tagline ??
+                  "Una estadía cálida en el centro de Tandil, cerquita de todo."}
               </p>
             </div>
             <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -103,6 +103,17 @@ export default async function HomePage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="relative mt-6 aspect-[3/4] w-full overflow-hidden sm:mt-8 sm:mx-auto sm:max-w-md sm:aspect-[3/4] md:max-w-lg">
+            <Image
+              src="/brand/header.jpg"
+              alt={property.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 512px"
+              priority
+            />
           </div>
         </section>
 

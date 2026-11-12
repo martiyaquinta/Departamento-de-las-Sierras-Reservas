@@ -9,24 +9,24 @@ type Photo = Extract<GalleryItem, { kind: "photo" }>;
 
 function useCarouselLayout() {
   const [layout, setLayout] = useState({
-    stageH: 420,
-    cardH: 280,
-    gap: 12,
-    perspective: 1800,
-    depthFade: 0.28,
+    stageH: 300,
+    cardH: 200,
+    gap: 10,
+    perspective: 1500,
+    depthFade: 0.22,
   });
 
   useEffect(() => {
     const apply = () => {
       const w = window.innerWidth;
       if (w < 400) {
-        setLayout({ stageH: 400, cardH: 260, gap: 10, perspective: 1600, depthFade: 0.22 });
+        setLayout({ stageH: 280, cardH: 180, gap: 8, perspective: 1400, depthFade: 0.18 });
       } else if (w < 640) {
-        setLayout({ stageH: 460, cardH: 300, gap: 12, perspective: 1800, depthFade: 0.28 });
+        setLayout({ stageH: 320, cardH: 210, gap: 10, perspective: 1600, depthFade: 0.22 });
       } else if (w < 1024) {
-        setLayout({ stageH: 560, cardH: 360, gap: 14, perspective: 2200, depthFade: 0.32 });
+        setLayout({ stageH: 420, cardH: 280, gap: 12, perspective: 2000, depthFade: 0.28 });
       } else {
-        setLayout({ stageH: 640, cardH: 400, gap: 16, perspective: 2600, depthFade: 0.35 });
+        setLayout({ stageH: 500, cardH: 340, gap: 14, perspective: 2400, depthFade: 0.32 });
       }
     };
     apply();
@@ -37,7 +37,7 @@ function useCarouselLayout() {
   return layout;
 }
 
-/** Galería “El lugar”: mobile-first, proporción nativa. */
+/** Galería “El lugar”: compacta en mobile. */
 export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
   const photos = items.filter((i): i is Photo => i.kind === "photo");
   const layout = useCarouselLayout();
