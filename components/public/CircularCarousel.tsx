@@ -113,28 +113,19 @@ export default function CircularCarousel({
   const [active, setActive] = useState(0);
   const [grabbing, setGrabbing] = useState(false);
 
-  const cardH = cardHeight ?? cardWidth / Math.max(aspectRatio, 0.2);
-  const itemSize = useCallback(
-    (item: CircularCarouselItem) => {
-      const ar = Math.max(0.35, Math.min(2.4, item.aspectRatio ?? aspectRatio));
-      const h = cardH;
-      const w = h * ar;
-      return { w, h, ar };
-    },
-    [cardH, aspectRatio]
-  );
-  const avgW = useMemo(() => {
-    if (!n) return cardWidth;
-    const sum = items.reduce((acc, it) => acc + itemSize(it).w, 0);
-    return sum / n;
-  }, [items, n, itemSize, cardWidth]);
+  // Slot uniforme para todas las fotos → gap idéntico (nada se pisa)
+  const slotAr = Math.max(0.5, Math.min(1.2, aspectRatio));
+  const cardH = cardHeight ?? cardWidth / slotAr;
+  const slotW = cardH * slotAr;
   const step = n > 0 ? 360 / n : 360;
   const radius = useMemo(() => {
-    if (n < 2) return avgW;
-    const chord = avgW + gap;
+    if (n < 2) return slotW;
+    // chord = ancho del slot + gap fijo entre vecinos
+    const chord = slotW + Math.max(8, gap);
     const r = chord / (2 * Math.sin(Math.PI / n));
-    return Math.max(r * (0.85 + curve * 0.35), avgW * 1.05);
-  }, [n, avgW, gap, curve]);
+    // curve > 1 aleja un poco (más aire); nunca achicar por debajo del mínimo
+    return r * Math.max(1, curve);
+  }, [n, slotW, gap, curve]);
 
   const dirSign = direction === "left" ? 1 : -1;
   const driftPerSec = autoplay === "drift" ? speed * 0.35 * dirSign : 0;
@@ -392,20 +383,18 @@ export default function CircularCarousel({
           transformStyle: "preserve-3d",
           transform: isCylinder
             ? `translate(-50%, -50%) rotateX(${tilt}deg) rotateY(${angle}deg)`
-            : `translate(-50%, -50%) translateX(${(-angle / step) * (avgW + gap)}px)`,
+            : `translate(-50%, -50%) translateX(${(-angle / step) * (slotW + gap)}px)`,
           pointerEvents: "none",
         }}
       >
         {items.map((item, i) => {
-          const { w: iw, h: ih } = itemSize(item);
           const itemAngle = i * step;
           const rel = ((itemAngle + angle) % 360 + 360) % 360;
           const delta = rel > 180 ? rel - 360 : rel;
           const abs = Math.abs(delta);
           const front = 1 - Math.min(1, abs / 90);
-          const zBoost = parallax * 40 * front;
-          const shade = innerShade * (1 - front);
-          const scale = 0.88 + front * 0.12;
+          // sin zBoost/scale variable: evita que se pisen o cambie el gap visual
+          const shade = innerShade * (1 - front) * 0.7;
 
           return (
             <div
@@ -413,21 +402,24 @@ export default function CircularCarousel({
               role="button"
               tabIndex={-1}
               onClick={() => onItemActivate(i)}
-              className="absolute left-1/2 top-1/2 origin-center overflow-visible"
+              className="absolute left-1/2 top-1/2 origin-center overflow-hidden"
               style={{
-                width: iw,
-                height: ih,
-                marginLeft: -iw / 2,
-                marginTop: -ih / 2,
+                width: slotW,
+                height: cardH,
+                marginLeft: -slotW / 2,
+                marginTop: -cardH / 2,
                 borderRadius: cornerRadius,
                 pointerEvents: "auto",
                 transform: isCylinder
-                  ? `rotateY(${itemAngle}deg) translateZ(${radius + zBoost}px) scale(${scale})`
-                  : `translateX(${i * (avgW + gap) - ((n - 1) * (avgW + gap)) / 2}px) scale(${scale})`,
+                  ? `rotateY(${itemAngle}deg) translateZ(${radius}px)`
+                  : `translateX(${i * (slotW + gap) - ((n - 1) * (slotW + gap)) / 2}px)`,
                 transformStyle: "preserve-3d",
                 zIndex: Math.round(front * 100),
-                opacity: 0.4 + front * 0.6,
-                boxShadow: front > 0.55 ? "0 18px 40px rgba(0,0,0,0.16)" : "0 8px 20px rgba(0,0,0,0.08)",
+                opacity: 0.55 + front * 0.45,
+                boxShadow:
+                  front > 0.6
+                    ? "0 14px 32px rgba(0,0,0,0.14)"
+                    : "0 6px 16px rgba(0,0,0,0.06)",
               }}
               aria-label={item.alt || item.title || `Foto ${i + 1}`}
               aria-current={i === active}
@@ -441,14 +433,14 @@ export default function CircularCarousel({
                   alt={item.alt}
                   fill
                   className="pointer-events-none object-contain"
-                  sizes={`${Math.round(iw * 1.6)}px`}
+                  sizes={`${Math.round(slotW * 1.5)}px`}
                   priority={i < 4}
                   draggable={false}
                 />
                 {shade > 0.02 && (
                   <span
                     className="pointer-events-none absolute inset-0"
-                    style={{ background: `rgba(0,0,0,${shade * 0.45})` }}
+                    style={{ background: `rgba(0,0,0,${shade})` }}
                     aria-hidden
                   />
                 )}

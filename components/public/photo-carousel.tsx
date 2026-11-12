@@ -11,8 +11,8 @@ function useCarouselLayout() {
   const [layout, setLayout] = useState({
     stageH: 300,
     cardH: 200,
-    gap: 10,
-    perspective: 1500,
+    gap: 16,
+    perspective: 1600,
     depthFade: 0.22,
   });
 
@@ -20,13 +20,13 @@ function useCarouselLayout() {
     const apply = () => {
       const w = window.innerWidth;
       if (w < 400) {
-        setLayout({ stageH: 280, cardH: 180, gap: 8, perspective: 1400, depthFade: 0.18 });
+        setLayout({ stageH: 280, cardH: 180, gap: 14, perspective: 1400, depthFade: 0.18 });
       } else if (w < 640) {
-        setLayout({ stageH: 320, cardH: 210, gap: 10, perspective: 1600, depthFade: 0.22 });
+        setLayout({ stageH: 320, cardH: 210, gap: 16, perspective: 1600, depthFade: 0.22 });
       } else if (w < 1024) {
-        setLayout({ stageH: 420, cardH: 280, gap: 12, perspective: 2000, depthFade: 0.28 });
+        setLayout({ stageH: 400, cardH: 270, gap: 18, perspective: 2000, depthFade: 0.28 });
       } else {
-        setLayout({ stageH: 500, cardH: 340, gap: 14, perspective: 2400, depthFade: 0.32 });
+        setLayout({ stageH: 480, cardH: 320, gap: 20, perspective: 2400, depthFade: 0.3 });
       }
     };
     apply();
@@ -37,7 +37,7 @@ function useCarouselLayout() {
   return layout;
 }
 
-/** Galería “El lugar”: compacta en mobile. */
+/** Galería “El lugar”: slots iguales + gap constante. */
 export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
   const photos = items.filter((i): i is Photo => i.kind === "photo");
   const layout = useCarouselLayout();
@@ -60,7 +60,6 @@ export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
   const carouselItems = photos.map((p) => ({
     src: p.src,
     alt: p.alt,
-    aspectRatio: p.aspect,
   }));
 
   return (
@@ -73,11 +72,12 @@ export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
         preset="cylinder"
         intro="rise"
         cardHeight={layout.cardH}
+        aspectRatio={0.72}
         speed={12}
         captions={false}
         gap={layout.gap}
         tilt={-2}
-        curve={1}
+        curve={1.08}
         perspective={layout.perspective}
         autoplay="drift"
         interval={3}
@@ -87,11 +87,11 @@ export function PhotoCarousel({ items }: { items: GalleryItem[] }) {
         pauseOnHover
         focusOnClick
         draggable
-        parallax={0.2}
+        parallax={0}
         stretch={0.75}
         fadeColor="#ffffff"
         depthFade={layout.depthFade}
-        innerShade={0.18}
+        innerShade={0.2}
         cornerRadius={10}
       />
     </div>
