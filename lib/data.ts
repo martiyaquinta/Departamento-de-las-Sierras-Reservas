@@ -66,17 +66,18 @@ export async function getProperty(): Promise<Property> {
 }
 
 export async function getPhotos(): Promise<Photo[]> {
-  if (!isSupabaseConfigured()) return DEMO_PHOTOS;
+  const fallback = DEMO_PHOTOS as Photo[];
+  if (!isSupabaseConfigured()) return fallback;
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("photos")
       .select("*")
       .order("sort_order", { ascending: true });
-    if (error || !data?.length) return DEMO_PHOTOS;
+    if (error || !data?.length) return fallback;
     return data as Photo[];
   } catch {
-    return DEMO_PHOTOS;
+    return fallback;
   }
 }
 

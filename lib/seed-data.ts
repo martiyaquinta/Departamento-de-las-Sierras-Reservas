@@ -1,4 +1,4 @@
-import type { Availability, Photo, Property, Reservation } from "@/lib/types";
+import type { Availability, Property, Reservation } from "@/lib/types";
 import { addDays, format, getDay, startOfDay } from "date-fns";
 import {
   DEFAULT_PRICE_MULTI_NIGHT_USD,
@@ -41,44 +41,12 @@ export const DEMO_PROPERTY: Property = {
   ],
   house_rules:
     "No se aceptan mascotas. No fumar dentro del depto. Sin fiestas. Finde: check-in viernes, check-out domingo (2 noches). Findes largos/puentes se abren a parte. Check-in desde las 15:00, check-out hasta las 11:00. Respetá a los vecinos.",
-  cover_photo_path: "/photos/depto-hero.jpg",
+  cover_photo_path: "/photos/header.jpg",
   updated_at: new Date().toISOString(),
 };
 
-export const DEMO_PHOTOS: Photo[] = [
-  {
-    id: "photo-1",
-    storage_path: "/photos/depto-01.jpg",
-    alt: "Departamento de las Sierras — living",
-    sort_order: 0,
-    is_cover: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "photo-2",
-    storage_path: "/photos/depto-02.jpg",
-    alt: "Departamento de las Sierras — ambiente",
-    sort_order: 1,
-    is_cover: false,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "photo-3",
-    storage_path: "/photos/depto-03.jpg",
-    alt: "Departamento de las Sierras — detalle",
-    sort_order: 2,
-    is_cover: false,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "photo-4",
-    storage_path: "/photos/depto-04.jpg",
-    alt: "Departamento de las Sierras — vista",
-    sort_order: 3,
-    is_cover: false,
-    created_at: new Date().toISOString(),
-  },
-];
+// Re-export catálogo local (fotosdepto) para demo / fallback Supabase vacío
+export { LOCAL_PHOTOS as DEMO_PHOTOS } from "@/lib/local-media";
 
 /** Vie+sáb available hasta endDate (default 2026-12-31). Puentes: abrir a mano en admin. */
 export function buildDemoAvailability(endDate = "2026-12-31"): Availability[] {
