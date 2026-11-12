@@ -41,7 +41,7 @@ export const DEMO_PROPERTY: Property = {
   ],
   house_rules:
     "No se aceptan mascotas. No fumar dentro del depto. Sin fiestas. Finde: check-in viernes, check-out domingo (2 noches). Findes largos/puentes se abren a parte. Check-in desde las 15:00, check-out hasta las 11:00. Respetá a los vecinos.",
-  cover_photo_path: "/photos/depto-hero.jpg",
+  cover_photo_path: "/photos/depto-03.jpg",
   updated_at: new Date().toISOString(),
 };
 

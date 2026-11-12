@@ -7,11 +7,11 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex min-h-12 items-center gap-2.5">
           <Image
-            src="/brand/logo-sinfondo.png"
+            src="/brand/header.jpg"
             alt="De Las Sierras"
-            width={36}
-            height={36}
-            className="h-8 w-8 object-contain sm:h-9 sm:w-9"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full object-cover sm:h-11 sm:w-11"
             priority
           />
           <span className="font-display text-[15px] font-semibold tracking-tight text-ink sm:text-base">

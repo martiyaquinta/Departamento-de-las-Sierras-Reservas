@@ -1,0 +1,138 @@
+[
+  {
+    "file": "depto-01.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_1_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-02.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_2_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-03.jpg",
+    "width": 1280,
+    "height": 720,
+    "aspect": 1.7778,
+    "transparent": false,
+    "source": "photo_3_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-04.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_4_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-05.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_5_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-06.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_6_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-07.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_7_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-08.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_8_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-09.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_9_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-10.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_10_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-11.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_11_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-12.jpg",
+    "width": 720,
+    "height": 1280,
+    "aspect": 0.5625,
+    "transparent": false,
+    "source": "photo_12_2026-11-12_11-04-36.jpg"
+  },
+  {
+    "file": "depto-13.png",
+    "width": 733,
+    "height": 1280,
+    "aspect": 0.5727,
+    "transparent": true,
+    "source": "photo_2026-09-05_23-33-46.jpg"
+  },
+  {
+    "file": "depto-14.png",
+    "width": 916,
+    "height": 1280,
+    "aspect": 0.7156,
+    "transparent": true,
+    "source": "photo_2026-09-06_00-57-57 (2).jpg"
+  },
+  {
+    "file": "depto-15.png",
+    "width": 990,
+    "height": 1280,
+    "aspect": 0.7734,
+    "transparent": true,
+    "source": "photo_2026-09-06_00-57-57.jpg"
+  },
+  {
+    "file": "depto-16.png",
+    "width": 966,
+    "height": 1280,
+    "aspect": 0.7547,
+    "transparent": true,
+    "source": "photo_2026-09-06_00-59-23.jpg"
+  },
+  {
+    "file": "depto-17.jpg",
+    "width": 1280,
+    "height": 960,
+    "aspect": 1.3333,
+    "transparent": false,
+    "source": "photo_2026-09-06_15-06-46.jpg"
+  }
+]

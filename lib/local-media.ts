@@ -1,158 +1,37 @@
 import type { Photo } from "@/lib/types";
+import photosManifest from "@/public/photos/manifest.json";
 
-/** Hero público: vista Tandil (fotosdepto/tandil.png). */
-export const LOCAL_HERO_PATH = "/photos/tandil.png";
+/** Hero: landscape del depto (fotosdepto). Header de sitio = /brand/header.jpg */
+export const LOCAL_HERO_PATH = "/photos/depto-03.jpg";
 
-/**
- * Galería pública = todas las imágenes de fotosdepto → public/photos.
- * (videos aparte en LOCAL_VIDEOS)
- */
-export const LOCAL_PHOTOS: Photo[] = [
-  {
-    id: "local-01",
-    storage_path: "/photos/depto-01.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 0,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-02",
-    storage_path: "/photos/depto-02.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 1,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-03",
-    storage_path: "/photos/depto-03.jpg",
-    alt: "Departamento de las Sierras — ambiente",
-    sort_order: 2,
-    is_cover: true,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-04",
-    storage_path: "/photos/depto-04.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 3,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-05",
-    storage_path: "/photos/depto-05.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 4,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-06",
-    storage_path: "/photos/depto-06.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 5,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-07",
-    storage_path: "/photos/depto-07.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 6,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-08",
-    storage_path: "/photos/depto-08.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 7,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-09",
-    storage_path: "/photos/depto-09.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 8,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-10",
-    storage_path: "/photos/depto-10.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 9,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-11",
-    storage_path: "/photos/depto-11.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 10,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-12",
-    storage_path: "/photos/depto-12.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 11,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-  {
-    id: "local-13",
-    storage_path: "/photos/depto-13.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 12,
-    is_cover: false,
-    created_at: "2026-09-05T00:00:00.000Z",
-  },
-  {
-    id: "local-14",
-    storage_path: "/photos/depto-14.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 13,
-    is_cover: false,
-    created_at: "2026-09-06T00:00:00.000Z",
-  },
-  {
-    id: "local-15",
-    storage_path: "/photos/depto-15.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 14,
-    is_cover: false,
-    created_at: "2026-09-06T00:00:00.000Z",
-  },
-  {
-    id: "local-16",
-    storage_path: "/photos/depto-16.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 15,
-    is_cover: false,
-    created_at: "2026-09-06T00:00:00.000Z",
-  },
-  {
-    id: "local-17",
-    storage_path: "/photos/depto-17.jpg",
-    alt: "Departamento de las Sierras",
-    sort_order: 16,
-    is_cover: false,
-    created_at: "2026-09-06T00:00:00.000Z",
-  },
-  {
-    id: "local-18",
-    storage_path: "/photos/depto-18.png",
-    alt: "Vista de Tandil",
-    sort_order: 17,
-    is_cover: false,
-    created_at: "2026-11-12T00:00:00.000Z",
-  },
-];
+export type LocalPhotoMeta = {
+  id: string;
+  storage_path: string;
+  alt: string;
+  sort_order: number;
+  is_cover: boolean;
+  created_at: string;
+  width: number;
+  height: number;
+  aspect: number;
+  transparent: boolean;
+};
+
+/** Todas las imágenes de fotosdepto (salvo header.jpg → brand). */
+export const LOCAL_PHOTOS: LocalPhotoMeta[] = photosManifest.map((m, i) => ({
+  id: `local-${String(i + 1).padStart(2, "0")}`,
+  storage_path: `/photos/${m.file}`,
+  alt: m.file.includes("18") || m.source.toLowerCase().includes("tandil")
+    ? "Vista de Tandil"
+    : "Departamento de las Sierras",
+  sort_order: i,
+  is_cover: i === 2,
+  created_at: "2026-11-12T00:00:00.000Z",
+  width: m.width,
+  height: m.height,
+  aspect: m.aspect,
+  transparent: m.transparent,
+}));
 
 export type LocalVideo = {
   id: string;
@@ -187,7 +66,17 @@ export const LOCAL_VIDEOS: LocalVideo[] = [
 ];
 
 export type GalleryItem =
-  | { kind: "photo"; id: string; src: string; alt: string; sort_order: number }
+  | {
+      kind: "photo";
+      id: string;
+      src: string;
+      alt: string;
+      sort_order: number;
+      width: number;
+      height: number;
+      aspect: number;
+      transparent: boolean;
+    }
   | {
       kind: "video";
       id: string;
@@ -202,8 +91,12 @@ export function getPublicPhotoItems(): GalleryItem[] {
     kind: "photo" as const,
     id: p.id,
     src: p.storage_path,
-    alt: p.alt ?? "Departamento de las Sierras",
+    alt: p.alt,
     sort_order: p.sort_order,
+    width: p.width,
+    height: p.height,
+    aspect: p.aspect,
+    transparent: p.transparent,
   }));
 }
 
