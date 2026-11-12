@@ -1,8 +1,8 @@
 import type { Photo } from "@/lib/types";
 import photosManifest from "@/public/photos/manifest.json";
 
-/** Hero: landscape del depto (fotosdepto). Header de sitio = /brand/header.jpg */
-export const LOCAL_HERO_PATH = "/photos/depto-03.jpg";
+/** Hero full-bleed (fotosdepto/header.jpg). Logo del site = /brand/logo-sinfondo.png */
+export const LOCAL_HERO_PATH = "/photos/header.jpg";
 
 export type LocalPhotoMeta = {
   id: string;
