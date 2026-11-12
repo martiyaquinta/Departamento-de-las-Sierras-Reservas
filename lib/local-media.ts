@@ -1,11 +1,11 @@
 import type { Photo } from "@/lib/types";
 
-/** Hero público: foto landscape del depto, sin logo en la imagen. */
-export const LOCAL_HERO_PATH = "/photos/depto-hero.jpg";
+/** Hero público: vista Tandil (fotosdepto/tandil.png). */
+export const LOCAL_HERO_PATH = "/photos/tandil.png";
 
 /**
- * Galería pública fija (fotosdepto → public/photos).
- * Se usa en home aunque Supabase tenga fotos viejas con logo.
+ * Galería pública = todas las imágenes de fotosdepto → public/photos.
+ * (videos aparte en LOCAL_VIDEOS)
  */
 export const LOCAL_PHOTOS: Photo[] = [
   {
@@ -101,6 +101,54 @@ export const LOCAL_PHOTOS: Photo[] = [
     storage_path: "/photos/depto-12.jpg",
     alt: "Departamento de las Sierras",
     sort_order: 11,
+    is_cover: false,
+    created_at: "2026-11-12T00:00:00.000Z",
+  },
+  {
+    id: "local-13",
+    storage_path: "/photos/depto-13.jpg",
+    alt: "Departamento de las Sierras",
+    sort_order: 12,
+    is_cover: false,
+    created_at: "2026-09-05T00:00:00.000Z",
+  },
+  {
+    id: "local-14",
+    storage_path: "/photos/depto-14.jpg",
+    alt: "Departamento de las Sierras",
+    sort_order: 13,
+    is_cover: false,
+    created_at: "2026-09-06T00:00:00.000Z",
+  },
+  {
+    id: "local-15",
+    storage_path: "/photos/depto-15.jpg",
+    alt: "Departamento de las Sierras",
+    sort_order: 14,
+    is_cover: false,
+    created_at: "2026-09-06T00:00:00.000Z",
+  },
+  {
+    id: "local-16",
+    storage_path: "/photos/depto-16.jpg",
+    alt: "Departamento de las Sierras",
+    sort_order: 15,
+    is_cover: false,
+    created_at: "2026-09-06T00:00:00.000Z",
+  },
+  {
+    id: "local-17",
+    storage_path: "/photos/depto-17.jpg",
+    alt: "Departamento de las Sierras",
+    sort_order: 16,
+    is_cover: false,
+    created_at: "2026-09-06T00:00:00.000Z",
+  },
+  {
+    id: "local-18",
+    storage_path: "/photos/depto-18.png",
+    alt: "Vista de Tandil",
+    sort_order: 17,
     is_cover: false,
     created_at: "2026-11-12T00:00:00.000Z",
   },

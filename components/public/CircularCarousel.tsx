@@ -329,9 +329,9 @@ export default function CircularCarousel({
         className
       )}
       style={{
-        height: Math.max(cardH * 1.35, 420),
+        height: Math.max(cardH * 1.65, 520),
         perspective: `${perspective}px`,
-        perspectiveOrigin: "50% 45%",
+        perspectiveOrigin: "50% 48%",
         touchAction: "none",
         ...style,
       }}
@@ -411,22 +411,22 @@ export default function CircularCarousel({
               aria-current={i === active}
             >
               <span
-                className="relative block h-full w-full overflow-hidden"
+                className="relative block h-full w-full overflow-hidden bg-transparent"
                 style={{ borderRadius: cornerRadius }}
               >
                 <Image
                   src={item.src}
                   alt={item.alt}
                   fill
-                  className="pointer-events-none object-cover"
-                  sizes={`${cardWidth}px`}
-                  priority={i < 3}
+                  className="pointer-events-none object-contain"
+                  sizes={`${Math.round(cardWidth * 1.5)}px`}
+                  priority={i < 4}
                   draggable={false}
                 />
                 {shade > 0.02 && (
                   <span
                     className="pointer-events-none absolute inset-0"
-                    style={{ background: `rgba(0,0,0,${shade})` }}
+                    style={{ background: `rgba(0,0,0,${shade * 0.55})` }}
                     aria-hidden
                   />
                 )}
